@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        body{
+            margin: 0;
+            padding-top: 100px;
+        }
+        img{
+            width: 100%;
+            height: 100%;
+        }
+        .sub-header {
+            height: 80px;
+            background-color: #47cda2;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 999;
+        }
+        .container{
+            width: 1228px;
+            margin: 0 auto;
+        }
+        .sub-header .logo{
+            width: 234px;
+            height: 80px;
+            float: left;
+        }
+        .sub-header .menu-list{
+            float: left;
+            line-height: 80px;
+        }
+        .sub-header .search{
+            float: right;
+            height: 100px;
+        }
+        .sub-header .menu-list a{
+            padding: 0 10px;
+            display: inline-block;
+            color: #333;
+            font-size: 16px;
+            text-decoration: none;
+        }
+        .sub-header .menu-list a:hover{
+            color: #ff6703;
+        }
+        .slider img{
+            width: 1226px;
+            height: 460px;
+        }
+        .news .channel{
+            width: 228px;
+            height: 164px;
+            background-color: #5f5750;
+            padding: 3px;
+        }
+        .news .channel .item{
+            width: 76px;
+            height: 82px;
+            float: left;
+            text-align: center;
+        }
+        .news .channel .item img{
+            height: 24px;
+            width: 24px;
+            display: block;
+            margin: 0 auto 4px;
+        }
+        .news .channel .item a{
+            font-size: 12px;
+            display: inline-block;
+            padding-top: 18px;
+            color: #fff;
+            text-decoration: none;
+            opacity: 0.7;
+        }
+        .news .list-item{
+            width: 316px;
+            height: 170px;
+        }
+        .left{
+            float: left;
+        }
+        .back{
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            border: 1px solid red;
+            right: 10px;
+            bottom: 50px;
+        }
+        .mask{
+            background-color: black;
+            opacity: 0.5;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            z-index: 100;
+        }
+        .dialog{
+            position: fixed;
+            width: 300px;
+            height: 500px;
+            background-color: #fff;
+            left: 50%;
+            z-index: 1000;
+        }
+        .app{
+            position: relative;
+        }
+        .app .download{
+            position: absolute;
+            height: 100px;
+            width: 100px;
+            display: none;
+        }
+        .app:hover .download{
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="sub-header">
+    <div class="container">
+        <div class="logo">
+            <!-- a, 行内标签， 默认设置高度，边距无效  -> 块级& 行内+块级-->
+            <a href="https://www.bilibili.com" style="margin-top: 12px; display: inline-block;">
+                <img src="../static/img/sub_header1.png" style="width: 56px; height: 56px;" alt="">
+            </a>
+        </div>
+        <div class="menu-list">
+            <a href="https://www.bilibili.com">Xiaomi手机</a>
+            <a>Redmi手机</a>
+            <a>电视</a>
+            <a>笔记本</a>
+            <a>平板</a>
+            <a>家电</a>
+            <a class="app">下载APP
+                <div class="download">
+                    <img src="../static/img/sub_header1.png" alt="">
+                </div>
+            </a>
+        </div>
+        <div class="search"></div>
+        <div style="clear: both;"></div>
+    </div>    
+</div>
+<div class="slider">
+    <div class="container">
+        <div class="sd-img">
+            <img src="../static/img/slider2.png" alt="None">
+        </div>
+    </div>
+</div>
+<div class="news">
+    <div class="container">
+        <div class="channel left">
+            <div class="item">
+                <a href="https://www.bilibili.com">
+                    <img src="../static/img/item.png" alt="">
+                    bili
+                </a>
+            </div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+            <div class="item">4</div>
+            <div class="item">5</div>
+            <div class="item">6</div>
+            <div style="clear: both;"></div>
+        </div>
+        <div class="list-item left" style="margin-left: 14px;">
+            <img src="../static/img/item1.png" alt="None">
+        </div>
+        <div class="list-item left" style="margin-left: 15px;">
+            <img src="../static/img/item1.png" alt="None">
+        </div>
+        <div class="list-item left" style="margin-left: 15px;">
+            <img src="../static/img/item1.png" alt="None">
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+</div>
+<div class="back"></div>
+<!-- <div class="mask"></div> -->
+<!-- <div class="dialog"> -->
+<div style="height: 1000px; background-color: #0dbdc3;"></div>
+
+</div>
+</body>
+</html>

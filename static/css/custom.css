@@ -1,0 +1,74 @@
+.me .title { font-size: 4em; }
+.me .undertitle { font-size: 2em; }
+
+.move-bottom-stuff-yes { margin-bottom: 3em; }
+
+.branding-grid { 
+    margin-top: 2em; 
+    align-items: center;
+}
+
+.branding-grid img {
+  max-width: 45vmin;
+}
+
+.branding-grid .img-container {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.branding-grid video {
+  width: 100%;
+}
+
+
+.notice {
+  font-weight: bold;
+  font-style: italic;
+}
+
+code {
+  font-family: monospace;
+  background-color: #000;
+  border-radius: 5px;
+  padding: 0.1em .2em;
+}
+
+.branding-grid .title {
+  font-size: 2em;
+}
+
+@media (max-width: 550px) {
+  .branding-grid img { max-width: 100%; }
+}
+
+footer {
+  margin-top: 2em;
+  margin-bottom: 0 !important;
+}
+
+.nav-top {
+    position: fixed;  /* 固定定位 */
+    top: 0;
+    right: 0;
+    padding: 1em 10em;  /* 增加右侧内边距 */
+    z-index: 1000;     /* 确保显示在最上层 */
+}
+  
+.nav-link {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+    padding: 5px 10px;
+}
+  
+.nav-link:hover {
+  color: #18cebf;
+}
+  
+.separator {
+    color: #666;
+    margin: 0 5px;
+}
