@@ -4,8 +4,8 @@ create table student
     -- 学生id(学工号)
 	sno char(10) primary key,
 
-    -- 密码
-	spasswd varchar(64),
+    -- bcrypt加密后的密码
+	shashedpasswd char(120),
 
     -- 学生姓名
 	sname varchar(16)
@@ -60,8 +60,8 @@ create table teacher
     -- 教师id(学工号)
 	tno char(10) primary key,
 
-    -- 密码
-	tpasswd varchar(64),
+    -- bcrypt加密后的密码
+	thashedpasswd char(120),
 
     -- 学生姓名
 	tname varchar(16)
