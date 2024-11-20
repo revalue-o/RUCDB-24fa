@@ -1,0 +1,52 @@
+.pagination {
+    margin: 20px 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.page-btn {
+    padding: 8px 15px;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.page-btn:hover {
+    background-color: #e4e4e4;
+}
+
+.page-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+#page-info {
+    font-size: 14px;
+    color: #666;
+}
+
+.content-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    display: none; /* 默认隐藏所有内容 */
+}
+
+.content-item.active {
+    display: block; /* 显示当前页的内容 */
+}
+
+.content-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.content-item a {
+    text-decoration: none;
+    color: #3498db;
+}

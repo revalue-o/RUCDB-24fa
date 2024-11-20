@@ -1,0 +1,220 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+/* 顶部导航栏 */
+.top-nav {
+    background-color: #2c3e50;
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    align-items: center;
+}
+
+.nav-left, .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.top-nav a {
+    color: white;
+    text-decoration: none;
+    padding: 5px 10px;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* 主体内容布局 */
+.main-content {
+    display: flex;
+    margin: 20px;
+    gap: 20px;
+}
+
+/* 左侧菜单 */
+.left-menu {
+    width: 250px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.course-title {
+    padding: 15px;
+    background-color: #3498db;
+    color: white;
+    border-radius: 4px 4px 0 0;
+}
+
+.menu-list {
+    padding: 10px 0;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    color: #666;
+    text-decoration: none;
+    gap: 10px;
+}
+
+.menu-item:hover {
+    background-color: #c6ecec;
+}
+
+.menu-item.active {
+    /* background-color: #f0f0f0; */
+    color: #3498db;
+    position: relative;
+}
+.menu-item.active::after {
+    content: '\27A4';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* 右侧内容区 */
+.right-content {
+    flex: 1;
+}
+
+.notice {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+/* 作业列表样式 */
+.homework-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.homework-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.homework-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.homework-info h3 {
+    font-size: 16px;
+    color: #2c3e50;
+}
+
+.tag {
+    background-color: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #666;
+}
+
+.status {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.status.submitted {
+    background-color: #39C5BB;
+    color: #155724;
+}
+.status.not-submitted {
+    background-color: white;
+    color: #856404;
+}
+.status.timeout {
+    color: #ffffff;  /* 白色文字以提高对比度 */
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+/* 课程切换区域 */
+.course-switch {
+    margin-top: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 4px;
+}
+
+.switch-title {
+    color: #2c3e50;
+    font-weight: bold;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.course-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.course-list a {
+    color: #666;
+    text-decoration: none;
+    padding: 5px 0;
+}
+
+.course-list a.active {
+    color: #3498db;
+}
+
+/* 实验作业特殊样式 */
+.homework-item.lab {
+    background-color: #d2eafb;
+}
+.homework-item.quiz {
+    background-color: #fce4ec;
+}
+.homework-item.norm {
+    background-color: #ffdab9;
+}
+.homework-item.submit {
+    background-color: #c6ecec;
+}
+.homework-item.time-out {
+    background-color: #ff4444;
+}
+.homework-item.lab .tag {
+    background-color: #2196f3;
+    color: white;
+}
+.homework-item.norm .tag {
+    background-color: #ff6700;
+    color: white;
+}
+.homework-item.quiz .tag {
+    background-color: #FFB6C1;
+    color: white;
+}

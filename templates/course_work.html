@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Course Work</title>
+    <link rel="stylesheet" href="../static/css/home.css" />
+    <link rel="stylesheet" href="../static/css/normalize.css" />
+    <link rel="stylesheet" href="../static/css/header.css" />
+    <link rel="stylesheet" href="../static/css/course_work.css" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-bar">
+                <div class="left-entry">
+                    <a href="/home" class="left-item">首页</a>
+                    <a href="#" class="left-item" id="course-trigger">课程</a>
+                    <div class="is-bottom" style="margin-left: 0px">
+                        <div class="pop-content">
+                            <div class="msg-entry">
+                                <div class="msg-list">
+                                    {% for course in courses[:8] %}
+                                        <a class="msg-item" href="#">{{ course }}</a>
+                                    {% endfor %}
+                                    {% if courses|length > 8 %}
+                                        <div class="msg-item">...</div>
+                                    {% endif %}
+                                    <div class="divider"></div>
+                                    <a class="msg-item" href="#">课程广场</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#" class="left-item">问答</a>
+                    <a href="#" class="left-item">小组</a>
+                </div>
+                <div class="right-entry">
+                    <a href="#">username</a>
+                </div>
+            </div>
+            <div class="header-inner">
+                <div class="banner">
+                    <div id="app">loading...</div>
+                </div>
+                <div class="banner-inner">
+                    <a href="https://www.bilibili.com/" class="inner-logo">
+                        <span class="logo-text">Unicourse</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- 左侧菜单 -->
+            <div class="left-menu">
+                <div class="course-title">
+                    <i class="icon-home"></i>
+                    <span>ICS1-2022级</span>
+                </div>
+
+                <div class="menu-list">
+                    <a href="/course" class="menu-item">
+                        <i class="icon-announcement"></i>
+                        <span>公告</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="icon-qa"></i>
+                        <span>问答</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="icon-group"></i>
+                        <span>小组</span>
+                    </a>
+                    <a href="/Cwork" class="menu-item active">
+                        <i class="icon-homework"></i>
+                        <span>作业</span>
+                    </a>
+                    <a href="/Csrc" class="menu-item">
+                        <i class="icon-files"></i>
+                        <span>课件</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="icon-outline"></i>
+                        <span>课程大纲</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="icon-comment"></i>
+                        <span>匿名吐槽区</span>
+                    </a>
+                </div>
+
+                <!-- 课程切换区域 -->
+                <div class="course-switch">
+                    <div class="switch-title">课程切换</div>
+                    <div class="course-list">
+                        {% for course in courses[:8] %}
+                            <a class="msg-item" href="#">{{ course }}</a>
+                        {% endfor %}
+                        {% if courses|length > 8 %}
+                            <div>...</div>
+                        {% endif %}
+                        <div class="divider"></div>
+                        <a class="msg-item" href="#">课程广场</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧内容区 -->
+            <div class="right-content">
+                <div class="notice">请同学们提交作业后做好备份。</div>
+
+                <div class="homework-list">
+                    {% for work in work_outline %}
+                        <div class="homework-item 
+                            {% if work.status == 'submitted' %}
+                                submit
+                            {% elif work.status == 'timeout' %}
+                                time-out
+                            {% elif work.type == '实验' %}
+                                lab
+                            {% elif work.type == '普通作业' %}
+                                norm
+                            {% elif work.type == '小测验' %}
+                                quiz
+                            {% endif %}
+                        ">
+                            <div class="homework-info">
+                                <h3>{{ work.name }}</h3>
+                                <span class="tag">{{ work.type }}</span>
+                            </div>
+                            <div class="status {{ work.status }}">
+                                {% if work.status == 'timeout' %}
+                                    超时
+                                {% elif work.status == 'not-submitted' %}
+                                    未提交
+                                {% elif work.status == 'submitted' %}
+                                    已提交
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <!-- 更多作业项... -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="module" src="{{ url_for('static', filename='js/home.js') }}"></script>
+<script>
+    window.addEventListener('scroll', function () {
+        const headerBar = document.querySelector('.header-bar');
+
+        if (window.scrollY > 50) {  // 滚动超过50px时
+            headerBar.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';  // 半透明黑色背景
+            headerBar.style.backdropFilter = 'blur(5px)';  // 毛玻璃效果
+        } else {  // 回到顶部时
+            headerBar.style.backgroundColor = 'transparent';
+            headerBar.style.backdropFilter = 'none';
+        }
+    });
+</script>
+
+</html>

@@ -1,22 +1,52 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home</title>
     <link rel="stylesheet" href="../static/css/home.css" />
     <link rel="stylesheet" href="../static/css/normalize.css" />
     <link rel="stylesheet" href="../static/css/header.css" />
-  </head>
-  <body>
+    <link rel="stylesheet" href="../static/css/home_container.css" />
+    <link rel="stylesheet" href="../static/css/pagination.css" />
+</head>
+
+<body>
     <div class="container">
         <div class="header">
             <div class="header-bar">
                 <div class="left-entry">
-                    <a href="https://www.bilibili.com">首页</a>
-                    <a href="https://www.bilibili.com">课程</a>
-                    <a href="https://www.bilibili.com">问答</a>
-                    <a href="https://www.bilibili.com">小组</a>
+                    <a href="#" class="left-item">首页</a>
+                    <a href="#" class="left-item" id="course-trigger">课程</a>
+                    <div class="is-bottom" style="margin-left: 0px">
+                        <div class="pop-content">
+                            <div class="msg-entry">
+                                <div class="msg-list">
+                                    {% for course in courses[:8] %}
+                                    <a class="msg-item" href="{{ url_for('course', course_name=course) }}">{{ course }}</a>
+                                    {% endfor %}
+                                    {% if courses|length > 8 %}
+                                    <div class="msg-item">...</div>
+                                    {% endif %}
+                                    <div class="divider"></div>
+                                    <a class="msg-item" href="#">课程广场</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <a href="#" class="course-trigger">课程</a>
+                    <div class="course-dropdown dropdown">
+                        <a href="#">全部课程</a>
+                        {% for item in courses %}
+                            <a href="#">{{ item.name }}</a>
+                        {% endfor %}
+                    </div> -->
+                    <a href="#" class="left-item">问答</a>
+                    <a href="#" class="left-item">小组</a>
+                </div>
+                <div class="right-entry">
+                    <a href="#">{{ session.username }}</a>
                 </div>
             </div>
             <div class="header-inner">
@@ -30,16 +60,83 @@
                 </div>
             </div>
         </div>
-        <div style="height: 1000px; background-color: #1199a3;">
+        <div class="main-container">
+            <!-- 左侧课程列表 -->
+            <div class="course-sidebar">
+                <div class="sidebar-header">
+                    <i class="icon-book"></i>
+                    <span>我的课程</span>
+                </div>
+                <div class="course-list">
+                    {% for course in courses[:12] %}
+                    <a class="msg-item" href="#">{{ course }}</a>
+                    {% endfor %}
+                    {% if courses|length > 12 %}
+                    <div class="msg-item">...</div>
+                    {% endif %}
+                    <div class="divider"></div>
+                    <a class="msg-item" href="#">课程广场</a>
+                </div>
+            </div>
 
+            <!-- 右侧内容区 -->
+            <div class="content-area">
+                <div class="content-nav">
+                    <a href="#" class="active">全部</a>
+                    <a href="#">问答</a>
+                    <a href="#">公告</a>
+                    <a href="#">作业</a>
+                    <a href="#">课件</a>
+                    <a href="#">大纲</a>
+                </div>
+                <div class="content-list" id="content-list">
+                    <div class="content-item">
+                        <a href="#">aaa课程资料</a>
+                    </div>
+                    {% for item in upload %}
+                    <div class="content-item">
+                        {% if 'src' in item %}
+                        <div>
+                            <a href="#">{{ item.name }}</a>
+                            <span>在</span>
+                            <a href="#">{{ item.course }}</a>
+                            <span>上传了课件</span>
+                        </div>
+                        <a href="#">{{ item.src }}</a>
+                        {% elif 'work' in item %}
+                        <div>
+                            <a href="#">{{ item.name }}</a>
+                            <span>在</span>
+                            <a href="#">{{ item.course }}</a>
+                            <span>布置了作业</span>
+                        </div>
+                        <a href="#">{{ item.work }}</a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% for item in items %}
+                    <div class="content-item">
+                        <a href="#">{{ item }}</a>
+                    </div>
+                    {% endfor %}
+
+                    <div class="pagination">
+                        <button onclick="previousPage()" id="prev-btn" class="page-btn">上一页</button>
+                        <span id="page-info">1 / 1</span>
+                        <button onclick="nextPage()" id="next-btn" class="page-btn">下一页</button>
+                    </div>
+                </div>
+
+            </div>
         </div>
+
     </div>
     <!-- <br /><br />
     <div id="selectBox"></div>
     <br /><br /> -->
-  </body>
+</body>
 
-  <!-- <script type="module">
+<!-- <script type="module">
     import barnersData from "./config.js";
     const selectBox = document.getElementById("selectBox");
     for (let i = 0; i < barnersData.length; i++) {
@@ -50,11 +147,12 @@
       selectBox.appendChild(btn);
     }
   </script> -->
-  <script type="module" src="{{ url_for('static', filename='js/home.js') }}"></script>
-  <script>
-    window.addEventListener('scroll', function() {
+<script type="module" src="{{ url_for('static', filename='js/home.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/pagination.js') }}"></script>
+<script>
+    window.addEventListener('scroll', function () {
         const headerBar = document.querySelector('.header-bar');
-        
+
         if (window.scrollY > 50) {  // 滚动超过50px时
             headerBar.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';  // 半透明黑色背景
             headerBar.style.backdropFilter = 'blur(5px)';  // 毛玻璃效果
@@ -63,12 +161,13 @@
             headerBar.style.backdropFilter = 'none';
         }
     });
-  </script>
-  <!-- <script>
+</script>
+<!-- <script>
     const scriptSrc = `./index.js?r=${Math.floor(Math.random() * 100)}`;
     const scriptElement = document.createElement("script");
     scriptElement.type = "module";
     scriptElement.src = scriptSrc;
     document.body.appendChild(scriptElement);
   </script> -->
+
 </html>

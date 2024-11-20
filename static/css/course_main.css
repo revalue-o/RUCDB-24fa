@@ -1,0 +1,137 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    background-color: #f5f5f5;
+}
+
+/* 顶部导航栏 */
+.top-nav {
+    background-color: #2c3e50;
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    align-items: center;
+    color: white;
+}
+
+.nav-left, .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.top-nav a {
+    color: white;
+    text-decoration: none;
+    padding: 5px 10px;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* 主体内容 */
+.main-content {
+    display: flex;
+    margin: 20px;
+    gap: 20px;
+}
+
+/* 左侧菜单 */
+.left-menu {
+    width: 250px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.course-title {
+    padding: 15px;
+    background-color: #3498db;
+    color: white;
+    border-radius: 4px 4px 0 0;
+}
+
+.menu-list {
+    padding: 10px 0;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+    gap: 10px;
+}
+
+.menu-item:hover {
+    background-color: #f5f5f5;
+}
+
+/* 课程切换区域 */
+.course-switch {
+    margin-top: 20px;
+    background: white;
+    border-radius: 4px;
+    padding: 15px;
+}
+
+.switch-title {
+    color: #2c3e50;
+    font-weight: bold;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.course-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.course-list a {
+    color: #666;
+    text-decoration: none;
+    padding: 5px 0;
+}
+
+.course-list a:hover {
+    color: #3498db;
+}
+
+/* 右侧内容区 */
+.right-content {
+    flex: 1;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.content-header {
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.content-body {
+    padding: 20px 0;
+    color: #666;
+}
+
+/* 图标样式 - 这里需要根据实际使用的图标库来调整 */
+[class^="icon-"] {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+}
