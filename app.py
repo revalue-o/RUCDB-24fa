@@ -4,11 +4,13 @@ import secrets
 import markdown
 import os
 import time
+import DatabaseManager
 os.chdir(os.path.dirname(__file__))
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = secrets.token_hex(16)
+myDB=DatabaseManager.DatabaseManager()
 #登录部分，负责人杜海乐
 @app.route('/login', methods=['GET', 'POST'])
 def login(): 
@@ -17,8 +19,9 @@ def login():
         password = request.form.get('password')
 
         # 简单的验证逻辑
-        if (username == 'admin' or username == 'student') and password == 'password':
-            session['username'] = username
+        # if (username == 'admin' or username == 'student') and password == 'password':
+        #     session['username'] = username
+        if myDB.student_login_check(username,password):
             return redirect(url_for('home'))
         else:
             error = 'Invalid username or password!'
@@ -31,6 +34,29 @@ def login():
 #     username = request.args.get('username', 'Guest')
 #     return f"<h1>Welcome, {username}!</h1>"
 #登录部分结束
+#注册部分
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        password2 = request.form.get('password2')
+
+        if password != password2:
+            error = 'Passwords do not match!'
+            return render_template('register.html', error=error)
+
+        # 简单的验证逻辑
+        if len(username) < 3 or len(password) < 6:
+            error = 'Username or password is too short!'
+            return render_template('register.html', error=error)
+
+        # 注册成功
+        myDB.add_student(username,password,username)
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
+#注册部分结束
 
 
 ## sq
