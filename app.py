@@ -22,6 +22,7 @@ def login():
         # if (username == 'admin' or username == 'student') and password == 'password':
         #     session['username'] = username
         if myDB.student_login_check(username,password):
+            session['username'] = username
             return redirect(url_for('home'))
         else:
             error = 'Invalid username or password!'
@@ -92,8 +93,11 @@ work_outline = [
 ]
 
 files = [
-    {'name': f'ppt{i}', 'date': '2024-11-19 22:44:46'} for i in range(15)
+    {'src': f'data/ppt{i}.pptx', 'date': '2024-11-19 22:44:46'} for i in range(15)
 ]
+for file in files:
+    file['name'] = os.path.basename(file['src'])
+
 
 @app.route('/index')
 def index():
@@ -102,23 +106,28 @@ def index():
 @app.route('/home')
 def home():
     if 'username' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
     print(f"home current_username: {session['username']}")
     return render_template('home.html', courses=courses, items=items, upload=upload)
 
 @app.route('/course/<string:course_name>')
 def course(course_name):
+    if 'username' not in session:
+        return redirect(url_for('index'))
     print(f"course current_username: {session['username']}")
-    time.sleep(3)
     return render_template('course_main.html', courses=courses, course_name=course_name)
 
-@app.route('/Cwork')
-def Cwork():
-    return render_template('course_work.html', courses=courses, work_outline=work_outline)
+@app.route('/Cwork/<string:course_name>')
+def Cwork(course_name):
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    return render_template('course_work.html', courses=courses, work_outline=work_outline, course_name=course_name)
 
-@app.route('/Csrc')
-def Csrc():
-    return render_template('course_src.html', courses=courses, files=files)
+@app.route('/Csrc/<string:course_name>')
+def Csrc(course_name):
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    return render_template('course_src.html', courses=courses, files=files, course_name=course_name)
 
 @app.route('/privacy')
 def privacy():
