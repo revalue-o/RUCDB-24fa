@@ -36,6 +36,8 @@ create table course
 
     -- 课程名称
     coursename varchar(32)
+
+    -- 注意: 暂定可以存在多门名称相同的课程(比如数院开的高代和统院开的高代)
 );
 
 create table class

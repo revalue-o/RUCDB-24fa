@@ -241,69 +241,69 @@ class DatabaseManager:
         self._print_debug("添加教师用户成功.")
         return 0
 
-    def delete_student(self,
-                       sno: str
-                       ):
-        '''
-        删除一个学生用户
+    # def delete_student(self,
+    #                    sno: str
+    #                    ):
+    #     '''
+    #     删除一个学生用户
 
-        参数:
-            sno:    学工号,char(10)
+    #     参数:
+    #         sno:    学工号,char(10)
     
-        返回:
-            0:  删除学生用户成功
-            1:  学工号格式不符合要求
-            2:  不存在该用户
-        '''
+    #     返回:
+    #         0:  删除学生用户成功
+    #         1:  学工号格式不符合要求
+    #         2:  不存在该用户
+    #     '''
 
-        if len(sno) != 10:
-            self._print_debug("删除学生用户失败.")
-            return 1
+    #     if len(sno) != 10:
+    #         self._print_debug("删除学生用户失败.")
+    #         return 1
         
-        query = f"select * from student where sno='{sno}'"
-        self._cursor.execute(query)
-        if self._cursor.fetchall() == []:
-            self._print_debug("删除学生用户失败.")
-            return 2
+    #     query = f"select * from student where sno='{sno}'"
+    #     self._cursor.execute(query)
+    #     if self._cursor.fetchall() == []:
+    #         self._print_debug("删除学生用户失败.")
+    #         return 2
 
-        query = f"delete from student where sno='{sno}'"
+    #     query = f"delete from student where sno='{sno}'"
 
-        self._cursor.execute(query)
-        self._connection.commit()
-        self._print_debug("删除学生用户成功.")
-        return 0
+    #     self._cursor.execute(query)
+    #     self._connection.commit()
+    #     self._print_debug("删除学生用户成功.")
+    #     return 0
         
-    def delete_teacher(self,
-                       tno: str
-                       ):
-        '''
-        删除一个教师用户
+    # def delete_teacher(self,
+    #                    tno: str
+    #                    ):
+    #     '''
+    #     删除一个教师用户
 
-        参数:
-            tno:    学工号,char(10)
+    #     参数:
+    #         tno:    学工号,char(10)
     
-        返回:
-            0:  删除教师用户成功
-            1:  学工号格式不符合要求
-            2:  不存在该用户
-        '''
+    #     返回:
+    #         0:  删除教师用户成功
+    #         1:  学工号格式不符合要求
+    #         2:  不存在该用户
+    #     '''
 
-        if len(tno) != 10:
-            self._print_debug("删除教师用户失败.")
-            return 1
+    #     if len(tno) != 10:
+    #         self._print_debug("删除教师用户失败.")
+    #         return 1
         
-        query = f"select * from teacher where tno='{tno}'"
-        self._cursor.execute(query)
-        if self._cursor.fetchall() == []:
-            self._print_debug("删除教师用户失败.")
-            return 2
+    #     query = f"select * from teacher where tno='{tno}'"
+    #     self._cursor.execute(query)
+    #     if self._cursor.fetchall() == []:
+    #         self._print_debug("删除教师用户失败.")
+    #         return 2
 
-        query = f"delete from teacher where tno='{tno}'"
+    #     query = f"delete from teacher where tno='{tno}'"
         
-        self._cursor.execute(query)
-        self._connection.commit()
-        self._print_debug("删除教师用户成功.")
-        return 0
+    #     self._cursor.execute(query)
+    #     self._connection.commit()
+    #     self._print_debug("删除教师用户成功.")
+    #     return 0
 
     def student_login_check(self,
                       sno: str,
@@ -353,7 +353,7 @@ class DatabaseManager:
             1:  密码验证不通过
             2:  用户不存在
         '''
-        query = f"select shashedpasswd from teacher where tno='{tno}'"
+        query = f"select thashedpasswd from teacher where tno='{tno}'"
         self._cursor.execute(query)
         result = self._cursor.fetchall()
 
@@ -368,3 +368,306 @@ class DatabaseManager:
         else:
             self._print_debug("教师用户登录验证失败.")
             return 1
+
+    def add_course(self,
+                   coursename: str
+                   ):
+        '''
+        添加一门课程
+
+        参数:
+            coursename:     课程名称,varchar(32)
+
+        返回:
+            0:  添加成功
+            1:  课程名称格式不符合要求
+
+        注意:
+            暂定可以存在多门名称相同的课程(比如数院开的高代和统院开的高代)
+            添加课程成功之后,数据库会自动生成courseid,可以用其它接口(后续实现)查询
+        '''
+
+        if len(coursename) > 32:
+            self._print_debug("添加课程失败.")
+            return 1
+
+        query = f"insert into course (coursename) values ('{coursename}');"
+        self._cursor.execute(query)
+        self._connection.commit()
+        self._print_debug("添加课程成功.")
+        return 0
+
+    def add_class(self,
+                  cname: str,
+                  csemester: str,
+                  courseno: int
+                  ):
+        '''
+        添加一个教学班
+
+        参数:
+            cname:      教学班名,varchar(32)
+            csemester:  开课学期,char(5)
+            courseno:   对应课程ID,serial
+
+        返回:
+            0:  添加成功
+            1:  教学班名不符合要求
+        
+        注意:
+            这里假定csemester和courseno不是由文本框输入的,
+            而是通过下拉框等形式转化成的,不会出错
+
+            csemester的格式参照课本,如20241, 20242
+
+            添加教学班成功之后,数据库会自动生成cno,可以用其它接口(后续实现)查询
+        '''
+        if len(cname) > 32:
+            self._print_debug("添加教学班失败.")
+            return 1
+    
+        query = f"insert into class (cname, csemester, courseno) values ('{cname}', '{csemester}', '{courseno}')"
+        self._cursor.execute(query)
+        self._connection.commit()
+        self._print_debug("添加教学班成功.")
+        return 0
+
+    def student_join_class(self,
+                           sno: str,
+                           cno: int
+                           ):
+        '''
+        把一个学生添加进一个教学班
+
+        参数:
+            sno:    学工号,char(10)
+            cno:    教学班ID,serial
+
+        返回:
+            0:  添加成功
+            1:  该学生已经在该班级当中
+
+        注意:
+            这里假定sno和cno不是由文本框输入的,
+            而是通过下拉框等形式转化成的,不会出错
+        '''
+        query = f"select * from attend_class where sno='{sno}' and cno='{cno}';"
+        self._cursor.execute(query)
+        if self._cursor.fetchall() != []:
+            self._print_debug("添加学生进入班级失败.")
+            return 1
+        
+        query = f"insert into attend_class values ('{sno}', '{cno}');"
+        self._cursor.execute(query)
+        self._connection.commit()
+        self._print_debug("添加学生进入班级成功.")
+        return 0
+
+    def teacher_join_class(self,
+                           tno: str,
+                           cno: int,
+                           is_ta: bool
+                           ):
+        '''
+        把一个教师添加进一个教学班
+
+        参数:
+            tno:    学工号,char(10)
+            cno:    教学班ID,serial
+            is_ta:  是否为助教,boolean
+
+        返回:
+            0:  添加成功
+            1:  该教师已经在该班级当中
+
+        注意:
+            这里假定tno, cno, is_ta不是由文本框输入的,
+            而是通过下拉框等形式转化成的,不会出错
+        '''
+        query = f"select * from teach_class where tno='{tno}' and cno='{cno}';"
+        self._cursor.execute(query)
+        if self._cursor.fetchall() != []:
+            self._print_debug("添加教师进入班级失败.")
+            return 1
+        
+        query = f"insert into teach_class values ('{tno}', '{cno}', {is_ta==True});"
+        self._cursor.execute(query)
+        self._connection.commit()
+        self._print_debug("添加教师进入班级成功.")
+        return 0
+
+    def add_handout(self,
+                    hname: str,
+                    hfilepath: str
+                    ):
+        '''
+        添加一个课件
+
+        参数:
+            hname:      课件名称,varchar(64)
+            hfilepath:  文件路径,varchar(128)
+
+        返回:
+            0:  添加课件成功
+            1:  课件名称格式不符合要求
+
+        注意：
+            1. 应该在已经上传文件并得到文件路径之后,再执行这个类方法.
+            2. 这个类方法只是在课件表当中添加一条记录,后续还应该执行post_handout()
+            3. 这里假定hfilepath不是由用户输入,而是后端自动生成的,因此不会超长
+            4. 允许同名课件,会自动生成不同的课件ID
+        '''
+        if len(hname) > 64:
+            self._print_debug("添加课件失败.")
+            return 1
+
+        query = f"insert into handout (hname, hfilepath) values ('{hname}', '{hfilepath}');"
+        self._cursor.execute(query)
+        self._connection.commit()
+        self._print_debug("添加课件成功.")
+        return 0
+
+    def post_handout(self,
+                     cno: int,
+                     hno: int,
+                     tno: str
+                     ):
+        '''
+        一个教师把一个课件发布到一个教学班
+
+        参数:
+            cno:    教学班ID,int
+            hno:    课件ID,int
+            tno:    教师的学工号,char(10)
+
+        返回:
+            0:  成功发布
+            1:  该课件先前已经被发布到该教学班中
+
+        注意:
+            这里假定cno, hno, tno都是后端代码给出,
+            而非用户在文本框当中输入的,不会出错;
+
+            同一个课件可以发布到不同的教学班,这里是对obe的一点改进
+
+            发布时间会自动存入数据库
+        '''
+
+        query = f"select * from post_handout where cno='{cno}' and hno='{hno}';"
+        self._cursor.execute(query)
+        if self._cursor.fetchall() != []:
+            self._print_debug("发布课件失败.")
+            return 1
+        
+        query = f"insert into post_handout values ({cno}, {hno}, '{tno}', now());"
+        self._cursor.execute(query)
+        self._connection.commit()
+        self._print_debug("发布课件成功.")
+        return 0
+
+    def add_assignment(self,
+                       aname: str,
+                       adeadline: int,
+                       aprofile: str,
+                       afilepath: str
+                       ):
+        '''
+        添加一个作业
+        参数:
+            aname:      作业名称,varchar(64)
+            adeadline:  截止时间,Unix时间戳(距离1970年的秒数)
+            aprofile:   作业简介,varchar(1024)
+            afilepath:  文件路径,varchar(128)
+
+        返回:
+            0:  添加作业成功
+            1:  作业名称格式不符合要求
+            2:  作业简介格式不符合要求
+
+        注意：
+            1. 应该在已经上传文件并得到文件路径之后,再执行这个类方法.
+            2. 这个类方法只是在作业表当中添加一条记录,后续还应该执行post_assignment()
+            3. 这里假定afilepath不是由用户输入,而是后端自动生成的,因此不会超长
+            4. 允许同名作业,会自动生成不同的作业ID
+        '''
+        if len(aname) > 64:
+            self._print_debug("添加作业失败.")
+            return 1
+        
+        if len(aprofile) > 1024:
+            self._print_debug("添加作业失败.")
+            return 2
+
+        query = f"insert into assignment (aname, adeadline, aprofile, afilepath) values ('{aname}', to_timestamp({adeadline}), '{aprofile}', '{afilepath}')"
+        self._cursor.execute(query)
+        self._connection.commit()
+        self._print_debug("添加作业成功.")
+        return 0
+
+    def post_assignment(self,
+                     cno: int,
+                     ano: int,
+                     tno: str
+                     ):
+        '''
+        一个教师把一个作业布置到一个教学班
+
+        参数:
+            cno:    教学班ID,int
+            ano:    作业ID,int
+            tno:    教师的学工号,char(10)
+
+        返回:
+            0:  成功发布
+            1:  该作业先前已经被布置到该教学班中
+
+        注意:
+            这里假定cno, ano, tno都是后端代码给出,
+            而非用户在文本框当中输入的,不会出错;
+
+            同一个作业可以布置到不同的教学班,这里是对obe的一点改进
+
+            布置时间会自动存入数据库
+        '''
+
+        query = f"select * from post_assignment where cno='{cno}' and ano='{ano}';"
+        self._cursor.execute(query)
+        if self._cursor.fetchall() != []:
+            self._print_debug("布置作业失败.")
+            return 1
+        
+        query = f"insert into post_assignment values ({cno}, {ano}, '{tno}', now());"
+        self._cursor.execute(query)
+        self._connection.commit()
+        self._print_debug("布置作业成功.")
+        return 0
+    
+    def submit_assignment(self,
+                          sno: str,
+                          ano: int,
+                          submit_filepath: str
+                          ):
+        '''
+        一个学生提交一次作业
+
+        参数:
+            sno:                学工号,char(10)
+            ano:                作业ID,int
+            submit_filepath:    文件路径,varchar(128)
+
+        返回:
+            0:  提交成功
+
+        注意：
+            自动覆盖之前的提交,提交时间、是否超时等信息自动保存到数据库当中
+        '''
+        query = f"select * from submit_assignment where sno='{sno}' and ano='{ano}';"
+        self._cursor.execute(query)
+        if self._cursor.fetchall() != []:
+            query = f"update submit_assignment set submit_time = now(), is_over_time = (now() > (select adeadline from assignment a where a.ano = {ano})), submit_filepath = '{submit_filepath}' where sno = '{sno}', ano = {ano};"
+        else:
+            query = f"insert into submit_assignment values ('{sno}', {ano}, now(), (now() > (select adeadline from assignment a where a.ano = {ano})), '{submit_filepath}');"
+        self._cursor.execute(query)
+        self._connection.commit()
+        self._print_debug("提交作业成功.")
+        return 0
