@@ -11,21 +11,28 @@ app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = secrets.token_hex(16)
 myDB=DatabaseManager.DatabaseManager()
+myDB.connect()
 #登录部分，负责人杜海乐
 @app.route('/login', methods=['GET', 'POST'])
 def login(): 
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        account_type=request.form.get('account-type')
 
         # 简单的验证逻辑
         # if (username == 'admin' or username == 'student') and password == 'password':
         #     session['username'] = username
-        if myDB.student_login_check(username,password):
+        if account_type=='teacher':
+            return_val=myDB.teacher_login_check(username,password)
+        else:
+            return_val=myDB.student_login_check(username,password)
+        print(return_val)
+        if return_val==0:
             session['username'] = username
             return redirect(url_for('home'))
         else:
-            error = 'Invalid username or password!'
+            error = 'wrong username or password'
             return render_template('login.html', error=error)
 
     return render_template('login.html')
@@ -42,6 +49,7 @@ def register():
         username = request.form.get('username')
         password = request.form.get('password')
         password2 = request.form.get('password2')
+        account_type=request.form.get('account-type')
 
         if password != password2:
             error = 'Passwords do not match!'
@@ -53,13 +61,32 @@ def register():
             return render_template('register.html', error=error)
 
         # 注册成功
-        myDB.add_student(username,password,username)
-        return redirect(url_for('login'))
+        #学工号长度必须为10，密码长度不限，学生姓名长度不超过16
+        if account_type=='teacher':
+            return_val=myDB.add_teacher(username,password,username)
+        else:
+            return_val=myDB.add_student(username,password,username)
+        print("account_type: ",account_type," return val: ",return_val)
+        if return_val==0:
+            return redirect(url_for('login'))
+        elif return_val==1:
+            error = '学工号格式不符合要求'
+            return render_template('register.html', error=error)
+        elif return_val==2:
+            error = '学生姓名不符合要求'
+            return render_template('register.html', error=error)
+        elif return_val==3:
+            error = '用户已存在'
+            return render_template('register.html', error=error)
+        
 
     return render_template('register.html')
 #注册部分结束
 
-
+# TODO dhl将下面的这些列表改为从数据库中读取
+# 
+def get_course_list():
+    return myDB.get_course_list()
 ## sq
 courses = [
     'ICS',
