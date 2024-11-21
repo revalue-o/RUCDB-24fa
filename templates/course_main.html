@@ -63,7 +63,7 @@
                 </div>
 
                 <div class="menu-list">
-                    <a href="/course" class="menu-item">
+                    <a href="{{ url_for('course', course_name=course_name) }}" class="menu-item">
                         <i class="icon-announcement"></i>
                         <span>公告</span>
                     </a>
@@ -75,11 +75,11 @@
                         <i class="icon-group"></i>
                         <span>小组</span>
                     </a>
-                    <a href="/Cwork" class="menu-item">
+                    <a href="{{ url_for('Cwork', course_name=course_name) }}" class="menu-item">
                         <i class="icon-homework"></i>
                         <span>作业</span>
                     </a>
-                    <a href="/Csrc" class="menu-item">
+                    <a href="{{ url_for('Csrc', course_name=course_name) }}" class="menu-item">
                         <i class="icon-files"></i>
                         <span>课件</span>
                     </a>
@@ -98,7 +98,7 @@
                     <div class="switch-title">课程切换</div>
                     <div class="course-list">
                         {% for course in courses[:8] %}
-                        <a class="msg-item" href="#">{{ course }}</a>
+                        <a class="msg-item" href="{{ url_for('course', course_name=course) }}">{{ course }}</a>
                         {% endfor %}
                         {% if courses|length > 8 %}
                         <div>...</div>
