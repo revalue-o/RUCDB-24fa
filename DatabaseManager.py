@@ -353,7 +353,7 @@ class DatabaseManager:
             1:  密码验证不通过
             2:  用户不存在
         '''
-        query = f"select shashedpasswd from teacher where tno='{tno}'"
+        query = f"select thashedpasswd from teacher where tno='{tno}'"
         self._cursor.execute(query)
         result = self._cursor.fetchall()
 
