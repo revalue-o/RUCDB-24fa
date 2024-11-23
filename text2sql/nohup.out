@@ -1,0 +1,25 @@
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]
+Loading checkpoint shards:  25%|██▌       | 1/4 [00:01<00:05,  1.98s/it]
+Loading checkpoint shards:  50%|█████     | 2/4 [00:04<00:04,  2.07s/it]
+Loading checkpoint shards:  75%|███████▌  | 3/4 [00:06<00:02,  2.03s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:06<00:00,  1.44s/it]
+Loading checkpoint shards: 100%|██████████| 4/4 [00:06<00:00,  1.66s/it]
+/home/liuyaoyang/anaconda3/envs/myenv/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:590: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`. This was detected when initializing the generation config instance, which means the corresponding file may hold incorrect parameterization and should be fixed.
+  warnings.warn(
+/home/liuyaoyang/anaconda3/envs/myenv/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:590: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+INFO:     Started server process [2816236]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://10.77.40.36:9080 (Press CTRL+C to quit)
+/home/liuyaoyang/anaconda3/envs/myenv/lib/python3.9/site-packages/transformers/generation/configuration_utils.py:590: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.0` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+finish
+finish
+INFO:     10.9.64.19:50577 - "POST /predict HTTP/1.1" 200 OK
+finish
+finish
+INFO:     10.9.64.19:50732 - "POST /predict HTTP/1.1" 200 OK
+finish
+finish
+INFO:     10.9.64.19:51217 - "POST /predict HTTP/1.1" 200 OK
