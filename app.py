@@ -35,6 +35,7 @@ def login():
         # if myDB.student_login_check(username,password):
         if login_success==0:
             session['username'] = username
+            session['role'] = account_type  # 存储角色类型
             return redirect(url_for('home'))
         else:
             error = 'Invalid username or password!'
@@ -116,6 +117,9 @@ def register():
 @app.route('/add_course', methods=['GET', 'POST'])
 def add_course():
     """添加课程页面"""
+        # 检查用户是否登录并且角色是 teacher
+    if 'role' not in session or session['role'] != 'teacher':
+        return "Access denied: Only teachers can add courses!", 403
     if request.method == 'POST':
         course_name = request.form.get('course_name')
         course_description = request.form.get('course_description')
@@ -139,6 +143,10 @@ def course_page(course_name):
     if course:
         return render_template('course.html', course_name=course_name, description='test fixed description')
     return "课程未找到", 404
+@app.route('/logout')
+def logout():
+    session.clear()  # 清除 session 数据
+    return redirect(url_for('login'))
 
 # TODO dhl将下面的这些列表改为从数据库中读取
 # 
