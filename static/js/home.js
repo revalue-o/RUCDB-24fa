@@ -17,8 +17,13 @@ let layers = []; // DOM集合
 // });
 
 function getRandomBanner() {
-    const randomIndex = Math.floor(Math.random() * barnersData.length);
-    return barnersData[randomIndex].data;
+    const weightedData = [
+        ...barnersData,
+        barnersData[2],  // 多复制几份第三个选项
+        barnersData[2],
+    ];
+    const randomIndex = Math.floor(Math.random() * weightedData.length);
+    return weightedData[randomIndex].data;
 }
 
 let allImagesData = getRandomBanner();

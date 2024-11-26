@@ -1,40 +1,48 @@
 # from flask import Flask, render_template
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import secrets
 import markdown
 import os
 import time
 import DatabaseManager
+
 os.chdir(os.path.dirname(__file__))
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = secrets.token_hex(16)
-myDB=DatabaseManager.DatabaseManager()
+
+myDB = DatabaseManager.DatabaseManager()
 myDB.connect()
 #登录部分，负责人杜海乐
+# @app.route('/login', methods=['GET', 'POST'])
+# def login(): 
+#     if request.method == 'POST':
+#         username = request.form.get('username')
+#         password = request.form.get('password')
+
+#         # 简单的验证逻辑
+#         # if (username == 'admin' or username == 'student') and password == 'password':
+#         #     session['username'] = username
+#         if myDB.student_login_check(username,password):
+#             session['username'] = username
+#             return redirect(url_for('home'))
+#         else:
+#             error = 'Invalid username or password!'
+#             return render_template('login.html', error=error)
+
+#     return render_template('login.html')
+
 @app.route('/login', methods=['GET', 'POST'])
-def login(): 
+def login():   # 登录部分先用的demo， 完整的在上面
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        account_type=request.form.get('account-type')
 
         # 简单的验证逻辑
-        # if (username == 'admin' or username == 'student') and password == 'password':
-        #     session['username'] = username
-        if account_type=='teacher':
-            return_val=myDB.teacher_login_check(username,password)
-        else:
-            return_val=myDB.student_login_check(username,password)
-        print(return_val)
-        if return_val==0:
+        if (username == 'admin' or username == 'student') and password == 'password':
             session['username'] = username
             return redirect(url_for('home'))
-        else:
-            error = 'wrong username or password'
-            return render_template('login.html', error=error)
-
     return render_template('login.html')
 
 # @app.route('/welcome')
@@ -110,20 +118,36 @@ upload = [
     {'name': 'cjc', 'course': 'DBMS', 'src': '第六章.ppt'},
     {'name': 'cjc', 'course': 'DBMS', 'work': '实验五'},
 ]
+'''
+    'src', 'work'必选其一  (暂时的, 公告啥的看看还做不做)
+    'date'key 在这里可以不需要, 但是需要按此排序
+'''
 
 work_outline = [
-    {'name': 'Lab4. cachelab', 'type': '实验', 'status': 'timeout'},
-    {'name': 'Lab4. cachelab', 'type': '实验', 'status': 'not-submitted'},
-    {'name': '代码优化', 'type': '普通作业', 'status': 'not-submitted'},
-    {'name': '磁盘访问', 'type': '小测验', 'status': 'submitted'},
-    {'name': '磁盘访问', 'type': '小测验', 'status': 'not-submitted'},
+    {'name': 'Lab4. cachelab', 'type': '实验', 'status': 'timeout', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'requirements': 'your requirements', 'attachment_url': 'your attachment_url'},
+    {'name': 'Lab4. cachelab', 'type': '实验', 'status': 'not-submitted', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'requirements': 'your requirements', 'attachment_url': 'your attachment_url'},
+    {'name': '代码优化', 'type': '普通作业', 'status': 'not-submitted', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'requirements': 'your requirements', 'attachment_url': 'your attachment_url'},
+    {'name': '磁盘访问', 'type': '小测验', 'status': 'submitted', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'requirements': 'your requirements', 'attachment_url': 'your attachment_url'},
+    {'name': '磁盘访问', 'type': '小测验', 'status': 'not-submitted', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'requirements': 'your requirements', 'attachment_url': 'your attachment_url'},
 ]
+'''
+    work_outline keys:
+        name: str  作业名
+        type: str  作业类型
+        status: str  作业状态  only('timeout', 'not-submitted', 'submitted')
+        deadline:   截止日期 strftime('%Y-%m-%d %H:%M:%S')
+        publish_time:   发布时间 strftime('%Y-%m-%d %H:%M:%S')
+        description: str  作业描述
+        requirements: str  作业要求  (这俩需要当成一个key吗)
+        attachment_url: str  附件url
+'''
 
 files = [
     {'src': f'data/ppt{i}.pptx', 'date': '2024-11-19 22:44:46'} for i in range(15)
 ]
 # 暂时的想法是： 在static下创建若干文件夹, src的路径只存放static/  后面的路径
-# eg. static/DBMS_cjc/第六章.ppt  ->  src = DBMS_cjc/第六章.ppt
+# eg. static/DBMS_cjc/src/第六章.ppt  ->  src = DBMS_cjc/第六章.ppt  （src类）
+#     static/DBMS_cjc/work_name/attachment.zip -> DBMS_cjc/work_name/attachment.zip
 for file in files:
     file['name'] = os.path.basename(file['src'])
 
@@ -131,32 +155,6 @@ for file in files:
 @app.route('/index')
 def index():
     return render_template('index.html')
-
-@app.route('/home')
-def home():
-    if 'username' not in session:
-        return redirect(url_for('index'))
-    # print(f"home current_username: {session['username']}")
-    return render_template('home.html', courses=courses, items=items, upload=upload)
-
-@app.route('/course/<string:course_name>')
-def course(course_name):
-    if 'username' not in session:
-        return redirect(url_for('index'))
-    # print(f"course current_username: {session['username']}")
-    return render_template('course_main.html', courses=courses, course_name=course_name)
-
-@app.route('/Cwork/<string:course_name>')
-def Cwork(course_name):
-    if 'username' not in session:
-        return redirect(url_for('index'))
-    return render_template('course_work.html', courses=courses, work_outline=work_outline, course_name=course_name)
-
-@app.route('/Csrc/<string:course_name>')
-def Csrc(course_name):
-    if 'username' not in session:
-        return redirect(url_for('index'))
-    return render_template('course_src.html', courses=courses, files=files, course_name=course_name)
 
 @app.route('/privacy')
 def privacy():
@@ -172,7 +170,83 @@ def terms():
         html = markdown.markdown(content)
     return render_template('_markdown.html', content=html)
 
+@app.route('/home')
+def home():
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    #TODO
+    '''
+    task: 从数据库读取内容到courses,upload, 下面的tasks同理
+        known: username
+        need: 所有courses: list
+              所有upload: dict  (参考上面的courses,upload实例)
+    '''
+    username = session['username']
 
+    return render_template('home.html', courses=courses, items=items, upload=upload)
+
+@app.route('/course/<string:course_name>')
+def course(course_name):
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    #TODO
+    '''
+        known: username, course_name
+        need: 所有courses: list
+    '''
+    username = session['username']
+
+    return render_template('course_main.html', courses=courses, course_name=course_name)
+
+@app.route('/Cwork/<string:course_name>')
+def Cwork(course_name):
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    #TODO
+    '''
+        known: username, course_name
+        need: 所有courses: list
+              该课程下的所有work_outline: dict  
+    '''
+    username = session['username']
+
+    return render_template('course_work.html', courses=courses, work_outline=work_outline, course_name=course_name)
+
+@app.route('/Csrc/<string:course_name>')
+def Csrc(course_name):
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    #TODO
+    '''
+        known: username, course_name
+        need: 所有courses: list
+              该课程下的所有files: dict  
+    '''
+    username = session['username']
+
+    return render_template('course_src.html', courses=courses, files=files, course_name=course_name)
+
+@app.route('/chatBOT', methods=['POST'])
+def chatBOT():
+    if 'username' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    data = request.get_json()
+    msg = data.get('message', '')
+    username = session['username']
+    #TODO
+    '''
+        known: username, msg
+        need: llm_response (关键是要有message项)
+    '''
+
+
+    response = {
+        'status': 'success',
+        'message': f'收到消息: {msg}',  # demo
+        'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
+        'username': username
+    }
+    return jsonify(response)
 
 
 if __name__ == '__main__':

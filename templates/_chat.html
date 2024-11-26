@@ -1,0 +1,22 @@
+<div class="chat-toggle-container">
+    <div id="chatPanel" class="chat-panel">
+        <div id="dragHandle" class="drag-handle"></div>
+        <div class="chat-content" id="chatContent">
+            <h4 style="border-bottom: 1px solid #e0e0e0; padding-bottom: 10px; margin-bottom: 15px;">CHAT</h3>
+            <!-- 聊天内容 -->
+        </div>
+        <div class="chat-input-area">
+            <textarea class="chat-input" id="chatInput" placeholder="请输入消息..."></textarea>
+            <button class="chat-send-btn" id="sendMessage">
+                <span class="material-icons">send</span>
+            </button>
+        </div>
+    </div>
+    <button id="chatToggle" class="chat-toggle-btn">
+        <span class="material-icons">smart_toy</span>
+    </button>
+</div>
+
+<script type="module" src="{{ url_for('static', filename='js/chat.js') }}"></script>
+<link rel="stylesheet" href="../static/css/chat.css" />
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />

@@ -1,0 +1,168 @@
+.chat-toggle-container {
+    position: fixed;
+    right: 0;
+    top: 160px; /* 调整顶部位置，避开导航栏 */
+    bottom: 0;
+    z-index: 2;
+}
+
+.chat-toggle-btn {
+    position: absolute;
+    left: -45px; /* 稍微加大一点按钮宽度 */
+    top: 20px;
+    width: 40px;
+    height: 40px;
+    background: #7dbeba;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px 0 0 8px;
+    outline: none;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+}
+
+.chat-panel {
+    position: absolute;
+    right: -400px;
+    top: 0;
+    height: 100%;
+    width: 400px;
+    background: white;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    min-width: 280px; 
+    max-width: 66.67vw;
+}
+
+.chat-panel.open {
+    right: 0;
+}
+
+.chat-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 添加聊天框样式 */
+.chat-input-area {
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+    background: white;
+    display: flex;  /* 使用flex布局 */
+    gap: 10px;  /* 设置间距 */
+    align-items: flex-end;  /* 底部对齐 */
+}
+
+.chat-input {
+    flex: 1;  /* 占据剩余空间 */
+    padding: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    resize: none;
+    height: 80px;  /* 固定高度 */
+    line-height: 1.5;
+}
+
+.chat-send-btn {
+    width: 40px;  /* 与高度相同，形成正方形 */
+    height: 40px;  /* 与输入框同高 */
+    border: none;
+    border-radius: 4px;
+    background: #7dbeba;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+}
+
+.chat-send-btn:hover {
+    background: #39C5BB;
+}
+
+
+.chat-panel.open + .chat-toggle-btn {
+    left: -30px; /* 保持按钮位置不变 */
+}
+
+.chat-toggle-btn:hover {
+    background: #39C5BB;
+    width: 50px; /* 悬停时略微放大 */
+    left: -50px;
+}
+
+.chat-toggle-btn .material-icons {
+    font-size: 24px;
+    transition: transform 0.3s;
+}
+
+.chat-panel.open + .chat-toggle-btn .material-icons {
+    animation: wave 2s infinite;
+}
+@keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+.drag-handle {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    cursor: ew-resize;
+    background: transparent;
+    transition: background 0.3s;
+}
+
+.drag-handle:hover {
+    background: #39C5BB;
+}
+
+/* 拖拽时的样式 */
+.dragging .drag-handle {
+    background: #39C5BB;
+}
+
+.message {
+    margin: 8px 0;
+    padding: 8px 16px;
+    width: 100%; /* 占满整个宽度 */
+    word-wrap: break-word;
+    line-height: 1.5;
+}
+
+.user-message {
+    background-color: transparent; /* 移除背景色 */
+    border: 1px solid #e0e0e0; /* 添加边框 */
+    border-radius: 4px;
+    /* font-family: Menlo, Monaco, "Courier New", monospace; */
+    font-size: 14px;
+}
+
+.bot-message {
+    background-color: transparent;
+    color: black;
+    font-size: 15px;
+}
+
+.chat-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    background-color: white; 
+}

@@ -15,10 +15,10 @@ export default [
     name: "魔法扫帚 - 高架桥",
     data: await banner_20240926.json()
 },
-{
-    name: "海洋机场 - 去旅行",
-    data: await banner_20240626.json()
-},
+// {
+//     name: "海洋机场 - 去旅行",
+//     data: await banner_20240626.json()
+// },
 {
     name: "花草丛生 - 大橘猫",
     data: await banner_20240606.json()
@@ -31,10 +31,10 @@ export default [
     name: "秋叶风筝 - 鼠鼠",
     data: await banner_20231117.json()
 },
-{
-    name: '海上明月 - 兔子',
-    data: await banner_20231001.json()
-},
+// {
+//     name: '海上明月 - 兔子',
+//     data: await banner_20231001.json()
+// },
 {
     name: '大海之上 - 鳄鱼',
     data: barnerImagesData2
@@ -42,5 +42,13 @@ export default [
 {
     name: '海洋生物 - 乌龟',
     data: barnerImagesData1
-}
+},
+// {
+//     name: "保留节目 - 包饺砸",
+//     data: await banner_20240201.json()
+// },
+// {
+//     name: "打工松鼠 - 猫头鹰",
+//     data: await banner_20231026.json()
+// },
 ]

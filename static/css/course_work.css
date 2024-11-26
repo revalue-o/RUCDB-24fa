@@ -11,32 +11,6 @@ body {
     color: #333;
 }
 
-/* 顶部导航栏 */
-.top-nav {
-    background-color: #2c3e50;
-    height: 50px;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 20px;
-    align-items: center;
-}
-
-.nav-left, .nav-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.top-nav a {
-    color: white;
-    text-decoration: none;
-    padding: 5px 10px;
-}
-
-.logo {
-    font-weight: bold;
-    font-size: 1.2em;
-}
 
 /* 主体内容布局 */
 .main-content {
@@ -55,7 +29,7 @@ body {
 
 .course-title {
     padding: 15px;
-    background-color: #3498db;
+    background-color: #39bcc5;
     color: white;
     border-radius: 4px 4px 0 0;
 }
@@ -79,7 +53,7 @@ body {
 
 .menu-item.active {
     /* background-color: #f0f0f0; */
-    color: #3498db;
+    color: #39C5BB;
     position: relative;
 }
 .menu-item.active::after {
@@ -110,7 +84,7 @@ body {
     gap: 10px;
 }
 
-.homework-item {
+/* .homework-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -118,7 +92,7 @@ body {
     padding: 15px;
     border-radius: 4px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
+} */
 
 .homework-info {
     display: flex;
@@ -191,30 +165,194 @@ body {
 }
 
 /* 实验作业特殊样式 */
-.homework-item.lab {
+.homework-header.lab {
     background-color: #d2eafb;
 }
-.homework-item.quiz {
+.homework-header.quiz {
     background-color: #fce4ec;
 }
-.homework-item.norm {
+.homework-header.norm {
     background-color: #ffdab9;
 }
-.homework-item.submit {
+.homework-header.submit {
     background-color: #c6ecec;
 }
-.homework-item.time-out {
+.homework-header.time-out {
     background-color: #ff4444;
 }
-.homework-item.lab .tag {
+.homework-header.lab .tag {
     background-color: #2196f3;
     color: white;
 }
-.homework-item.norm .tag {
+.homework-header.norm .tag {
     background-color: #ff6700;
     color: white;
 }
-.homework-item.quiz .tag {
+.homework-header.quiz .tag {
     background-color: #FFB6C1;
     color: white;
+}
+.homework-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.homework-item {
+    margin-bottom: 15px;
+    /* border: 1px solid #eb1818; */
+    border-radius: 4px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.homework-item:has(.homework-header.lab) {
+    border: 1px solid #d2eafb;
+}
+
+.homework-item:has(.homework-header.quiz) {
+    border: 1px solid #fce4ec;
+}
+
+.homework-item:has(.homework-header.norm) {
+    border: 1px solid #ffdab9;
+}
+
+.homework-item:has(.homework-header.submit) {
+    border: 1px solid #c6ecec;
+}
+
+.homework-item:has(.homework-header.time-out) {
+    border: 1px solid #ebbfbf;
+}
+
+/* 作业详情样式 */
+.homework-details {
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+    padding: 0;
+    margin-top: 0;
+    transition: all 0.3s ease;
+}
+
+.details-content {
+    padding: 20px;
+}
+
+.time-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.publish-time {
+    color: #666;
+    font-size: 12px;
+    padding: 10px 15px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.deadline {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 15px; 
+    font-weight: 500; 
+    padding: 10px 15px;  
+    background-color: #f5f5f5; 
+    border-radius: 4px; 
+    display: inline-block;  
+}
+
+.deadline span:lang(zh) {
+    font-family: "楷体", KaiTi, STKaiTi, serif;
+}
+
+.deadline span:lang(en) {
+    font-family: "Times New Roman", Times, serif;
+}
+
+.homework-item:has(.homework-header.lab) .deadline {
+    border-left: 4px solid #2196f3;  /* 实验的蓝色 */
+}
+
+.homework-item:has(.homework-header.quiz) .deadline {
+    border-left: 4px solid #f9c5d6;  /* 小测验的粉色 */
+}
+
+.homework-item:has(.homework-header.norm) .deadline {
+    border-left: 4px solid #ff6700;  /* 普通作业的橙色 */
+}
+
+.homework-item:has(.homework-header.submit) .deadline {
+    border-left: 4px solid #39C5BB;  /* 已提交的青色 */
+}
+
+.homework-item:has(.homework-header.time-out) .deadline {
+    border-left: 4px solid #ff4444;  /* 超时的红色 */
+}
+
+.description {
+    color: #61666D;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.requirements {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+    color: #61666D;
+    font-size: 14px;
+}
+
+.requirements h4 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.attachment {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+    color: #61666D;
+    font-size: 14px;
+}
+
+.attachment h4 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.attachment-link {
+    color: #1890ff;
+    text-decoration: none;
+    display: inline-block;
+    padding: 5px 0;
+}
+
+.attachment-link:hover {
+    color: #40a9ff;
+}
+
+.submit-btn {
+    background: #1890ff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.submit-btn:hover {
+    background: #40a9ff;
 }
