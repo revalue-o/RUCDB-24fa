@@ -99,8 +99,7 @@ def register():
 
     return render_template('register.html')
 #注册部分结束
-#是谁来创建教学班、添加课程这些？是教师还是管理员？
-#先认为是管理员
+
 '''
 所有我对GUI操作的都放在这里，不要删除
 目前暂定在home页面只能通过课程名进入新页面再访问作业什么的，不能通过点击home页面的“作业”进入新页面
@@ -109,9 +108,37 @@ def register():
 进入课程的功能。
 类似进入https://unicourse.ruc.edu.cn/index/homework/index/cno/2023l7fcquowtxje.html
 
+由教师添加课程什么的
+
 '''
-#教师添加作业、课件
-@app.route('/add_work', methods=['GET', 'POST'])
+#courses = {}# 这一行是临时的，当从数据库中读取课程的API完成后将采用对应的API
+#教师添加课程
+@app.route('/add_course', methods=['GET', 'POST'])
+def add_course():
+    """添加课程页面"""
+    if request.method == 'POST':
+        course_name = request.form.get('course_name')
+        course_description = request.form.get('course_description')
+        # if course_name and course_description:
+        #     # 存储课程信息
+        #     courses[course_name] = {'description': course_description}
+        result=myDB.add_course(course_name)
+        if result==0:
+            #courses[course_name] = {'description': 'fixed test str'}# 这一行是临时的，当从数据库中读取课程的API完成后将采用对应的API
+            return redirect(url_for('course_page', course_name=course_name))
+        elif result==1:
+            return "错误的课程名称", 400
+        return "课程名称和描述不能为空", 400
+    return render_template('add_course.html')
+
+@app.route('/cno/<course_name>')
+def course_page(course_name):
+    """课程页面"""
+    # course = courses.get(course_name)
+    course=course_name
+    if course:
+        return render_template('course.html', course_name=course_name, description='test fixed description')
+    return "课程未找到", 404
 
 # TODO dhl将下面的这些列表改为从数据库中读取
 # 

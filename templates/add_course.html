@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>添加新课程</h2>
+<form method="post">
+    <label for="course_name">课程名称:</label>
+    <input type="text" id="course_name" name="course_name" required>
+    <br>
+    <label for="course_description">课程描述:</label>
+    <textarea id="course_description" name="course_description" required></textarea>
+    <br>
+    <button type="submit">提交</button>
+</form>
+<a href="{{ url_for('home') }}">返回首页</a>
+{% endblock %}
