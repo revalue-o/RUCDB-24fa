@@ -5,6 +5,7 @@ import markdown
 import os
 import time
 import DatabaseManager
+import requests # llm
 
 os.chdir(os.path.dirname(__file__))
 
@@ -238,11 +239,23 @@ def chatBOT():
         known: username, msg
         need: llm_response (关键是要有message项)
     '''
+    llm_url = "http://10.77.40.36:9080/predict"
+    llm_headers = {
+        "Authorization": "4f484d4324b66bdbb835415c454fab772a14d126555d5a0df897b4a22c38706b",
+        "Content-Type": "application/json",
+    }
+    input_data = {"input_data": msg} 
+    
+    response = requests.post(llm_url, headers=llm_headers, json=input_data)
+    # print(response.status_code)  DEBUG 连接状态
+    re_dict = response.json()  # dict item
+
+    
 
 
     response = {
         'status': 'success',
-        'message': f'收到消息: {msg}',  # demo
+        'message': f'收到消息: {re_dict['response']}',  # demo
         'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
         'username': username
     }
