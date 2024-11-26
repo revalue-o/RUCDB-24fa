@@ -16,35 +16,43 @@ app.secret_key = secrets.token_hex(16)
 myDB = DatabaseManager.DatabaseManager()
 myDB.connect()
 #登录部分，负责人杜海乐
+@app.route('/login', methods=['GET', 'POST'])
+def login(): 
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        account_type=request.form.get('account-type')
+        login_success=-1
+        if account_type=='teacher':
+            login_success=myDB.teacher_login_check(username,password)
+        else:
+            login_success=myDB.student_login_check(username,password)
+        
+
+        # 简单的验证逻辑
+        # if (username == 'admin' or username == 'student') and password == 'password':
+        #     session['username'] = username
+        # if myDB.student_login_check(username,password):
+        if login_success==0:
+            session['username'] = username
+            return redirect(url_for('home'))
+        else:
+            error = 'Invalid username or password!'
+            return render_template('login.html', error=error)
+
+    return render_template('login.html')
+
 # @app.route('/login', methods=['GET', 'POST'])
-# def login(): 
+# def login():   # 登录部分先用的demo， 完整的在上面
 #     if request.method == 'POST':
 #         username = request.form.get('username')
 #         password = request.form.get('password')
 
 #         # 简单的验证逻辑
-#         # if (username == 'admin' or username == 'student') and password == 'password':
-#         #     session['username'] = username
-#         if myDB.student_login_check(username,password):
+#         if (username == 'admin' or username == 'student') and password == 'password':
 #             session['username'] = username
 #             return redirect(url_for('home'))
-#         else:
-#             error = 'Invalid username or password!'
-#             return render_template('login.html', error=error)
-
 #     return render_template('login.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():   # 登录部分先用的demo， 完整的在上面
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-        # 简单的验证逻辑
-        if (username == 'admin' or username == 'student') and password == 'password':
-            session['username'] = username
-            return redirect(url_for('home'))
-    return render_template('login.html')
 
 # @app.route('/welcome')
 # def welcome():
@@ -91,6 +99,19 @@ def register():
 
     return render_template('register.html')
 #注册部分结束
+#是谁来创建教学班、添加课程这些？是教师还是管理员？
+#先认为是管理员
+'''
+所有我对GUI操作的都放在这里，不要删除
+目前暂定在home页面只能通过课程名进入新页面再访问作业什么的，不能通过点击home页面的“作业”进入新页面
+
+原本的obe的首页仅仅是一个最近信息的作用，不会显示所有的作业等信息。我们暂时不实现这个功能，而是先实现obe左上角下拉菜单
+进入课程的功能。
+类似进入https://unicourse.ruc.edu.cn/index/homework/index/cno/2023l7fcquowtxje.html
+
+'''
+#教师添加作业、课件
+@app.route('/add_work', methods=['GET', 'POST'])
 
 # TODO dhl将下面的这些列表改为从数据库中读取
 # 
