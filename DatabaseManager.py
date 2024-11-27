@@ -671,3 +671,133 @@ class DatabaseManager:
         self._connection.commit()
         self._print_debug("提交作业成功.")
         return 0
+    def select_info_home(self,sno):
+        '''
+        :param sno:
+        :return:courses upload
+        查询学生姓名：根据学号从 student 表中查询学生姓名。
+        查询课程名称：根据学号从 attend_class 表中获取教学班ID，再从 class 表中获取课程ID，最后从 course 表中获取课程名称。
+        查询上传资料：根据学号从多个表中联查教师上传的资料信息。
+        查询上传作业：根据学号从多个表中联查教师上传的作业信息。
+        返回结果：将查询到的学生姓名、课程名称和上传信息返回。
+        '''
+        query_student_name=f"select s1.sname from student s1 where s1.sno={sno}; "
+        try:
+            self._cursor.execute(query_student_name)
+            student_name=self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        student_name=student_name[0][0]
+        query_course=f"select cor1.coursename from course cor1,class cla1,attend_class at1 where at1.sno={sno} and at1.cno=cla1.cno and cla1.courseno=cor1.courseno;"
+        try:
+            self._cursor.execute(query_course)
+            course_name=self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        query_course=[i[0] for i in course_name]
+        query_src = (
+            f"SELECT t1.tname, cour1.coursename, hand1.hname "
+            f"FROM attend_class at1, teach_class tc1, teacher t1, course cour1, class cla1, post_handout ph1, handout hand1 "
+            f"WHERE at1.sno = {sno} "
+            f"AND tc1.cno = at1.cno "
+            f"AND tc1.tno = t1.tno "
+            f"AND cla1.cno = at1.cno "
+            f"AND cour1.courseno = cla1.courseno "
+            f"AND ph1.cno = tc1.cno "
+            f"AND ph1.hno = hand1.hno;"
+        )
+        try:
+            self._cursor.execute(query_src)
+            src=self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        upload_info=[]
+        for i in src:
+            upload_info.append({"name":i[0],"course":i[1],"src":i[2]})
+        query_work = (
+            f"SELECT t1.tname, cour1.coursename, ass1.aname "
+            f"FROM attend_class at1, teach_class tc1, teacher t1, course cour1, class cla1, post_assignment pa1, assignment ass1 "
+            f"WHERE at1.sno = {sno} "
+            f"AND tc1.cno = at1.cno "
+            f"AND tc1.tno = t1.tno "
+            f"AND cla1.cno = at1.cno "
+            f"AND cour1.courseno = cla1.courseno "
+            f"AND pa1.cno = tc1.cno "
+            f"AND pa1.ano = ass1.ano;"
+        )
+        try:
+            self._cursor.execute(query_work)
+            work=self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        for i in work:
+            upload_info.append({"name":i[0],"course":i[1],"work":i[2]})
+        return student_name,query_course,upload_info
+
+
+    def select_info_course(self,sno,course_name):
+        pass
+    def select_student_src(self,sno,course_name):
+        '''
+
+        :param sno:
+        :param course_name:
+        :return:
+        这段代码定义了一个名为 select_student_src 的方法，用于从数据库中查询特定学生在特定课程中的课件信息。具体功能如下：
+        构建 SQL 查询：根据传入的学生编号 sno 和课程名称 course_name，构建一个 SQL 查询语句，从多个表中获取相关数据。
+        执行查询：使用 _cursor 对象执行 SQL 查询，并捕获可能的异常。
+        处理结果：将查询结果转换为一个包含课程名、课件名、发布时间和文件路径的字典列表。
+        返回结果：返回包含上述信息的字典列表。
+        '''
+        query_src = (
+            f"SELECT cour1.coursename, hand1.hname,ph1.post_handout_time,hand1.hfilepath"
+            f"FROM attend_class at1, course cour1, class cla1, post_handout ph1, handout hand1 "
+            f"WHERE at1.sno = {sno} "
+            f"AND cla1.cno = at1.cno "
+            f"AND cour1.courseno = cla1.courseno "
+            f"AND ph1.cno = at1.cno "
+            f"AND ph1.hno = hand1.hno"
+            f"AND cour1.coursename LIKE {course_name}"
+        )
+        try:
+            self._cursor.execute(query_src)
+            src=self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        files=[]
+        for i in src:
+            files.append({"course":i[0],"name":i[1],"date":i[2],"path":i[3]})
+        return files
+    def select_student_work(self,sno,course_name):
+        query_work = (
+            f"SELECT  cour1.coursename, ass1.aname ,ass1.adeadline,ass1.aprofile,ass1.afilepath"
+            f"FROM attend_class at1, course cour1, class cla1, post_assignment pa1, assignment ass1 "
+            f"WHERE at1.sno = {sno} "
+            f"AND cla1.cno = at1.cno "
+            f"AND cour1.courseno = cla1.courseno "
+            f"AND pa1.cno = tc1.cno "
+            f"AND pa1.ano = ass1.ano"
+            f"AND cour1.coursename LIKE {course_name};"
+        )
+        try:
+            self._cursor.execute(query_work)
+            work = self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        work_load=[]
+        for i in work:
+            work_load.append({"course":i[0],"name":i[1],"deadline":i[2],"profile":i[3],"path":i[4]})
+        return work_load
+
+
+
+
+
+
+
