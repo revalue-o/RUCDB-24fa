@@ -674,6 +674,7 @@ class DatabaseManager:
     
     def select_info_home(self,sno):
         #测试人员认为这里可能出现sql注入---sno  sno=' or 1=1;--
+        
         '''
         :param sno:
         :return:courses upload
@@ -796,3 +797,8 @@ class DatabaseManager:
         for i in work:
             work_load.append({"course":i[0],"name":i[1],"deadline":i[2],"profile":i[3],"path":i[4]})
         return work_load
+    
+'''
+TODO:
+1.select_info_home函数仅考虑了学生的情况，应该增加对教师的查询
+'''
