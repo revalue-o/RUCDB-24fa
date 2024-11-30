@@ -6,13 +6,16 @@ import os
 import time
 import DatabaseManager
 import requests # llm
+from datetime import datetime
 
 os.chdir(os.path.dirname(__file__))
+
+UPLOAD_FOLDER = 'load'
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = secrets.token_hex(16)
-
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 myDB = DatabaseManager.DatabaseManager()
 myDB.connect()
 #登录部分，负责人杜海乐
@@ -30,7 +33,7 @@ def login():
         
 
         # 简单的验证逻辑
-        # if (username == 'admin' or username == 'student') and password == 'password':
+        # if (username == 'amin' or username == 'student') and password == 'password':
         #     session['username'] = username
         # if myDB.student_login_check(username,password):
         if login_success==0:
@@ -38,7 +41,7 @@ def login():
             session['role'] = account_type  # 存储角色类型
             return redirect(url_for('home'))
         else:
-            error = 'Invalid username or password!'
+            error = 'Invalidusername or password!'
             return render_template('login.html', error=error)
 
     return render_template('login.html')
@@ -48,11 +51,13 @@ def login():
 #     if request.method == 'POST':
 #         username = request.form.get('username')
 #         password = request.form.get('password')
+#         account_type=request.form.get('account-type')
 
 #         # 简单的验证逻辑
-#         if (username == 'admin' or username == 'student') and password == 'password':
+#         if (username == 'amin' or username == 'student') and password == 'password':
 #             session['username'] = username
 #             return redirect(url_for('home'))
+
 #     return render_template('login.html')
 
 # @app.route('/welcome')
@@ -159,20 +164,20 @@ courses = [
     '人工智能引论',
     '数据科学导论',
     '操作系统',
-    '计算机网络',
     'DBMS',
     'ICS2',
     '马克思主义',
     '毛概',
     '程序设计',
     'photoshop',
-    '数学分析'
+    '数学分析',
+    '线性代数'
 ]
 
 items = [f"item{i}" for i in range(12)]
 
 upload = [
-    {'name': 'cjc', 'course': 'DBMS', 'src': '第六章.ppt'},
+    {'name': 'cjc', 'course': 'DBMS', 'src': '第六章.ppt'}, # 这里只需要最后的文件名
     {'name': 'cjc', 'course': 'DBMS', 'work': '实验五'},
 ]
 '''
@@ -181,30 +186,30 @@ upload = [
 '''
 
 work_outline = [
-    {'name': 'Lab4. cachelab', 'type': '实验', 'status': 'timeout', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'requirements': 'your requirements', 'attachment_url': 'your attachment_url'},
-    {'name': 'Lab4. cachelab', 'type': '实验', 'status': 'not-submitted', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'requirements': 'your requirements', 'attachment_url': 'your attachment_url'},
-    {'name': '代码优化', 'type': '普通作业', 'status': 'not-submitted', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'requirements': 'your requirements', 'attachment_url': 'your attachment_url'},
-    {'name': '磁盘访问', 'type': '小测验', 'status': 'submitted', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'requirements': 'your requirements', 'attachment_url': 'your attachment_url'},
-    {'name': '磁盘访问', 'type': '小测验', 'status': 'not-submitted', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'requirements': 'your requirements', 'attachment_url': 'your attachment_url'},
+    {'name': 'Lab4. cachelab', 'type': '实验', 'status': 'timeout', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'attachment_url': 'your attachment_url'},
+    {'name': 'Lab4. cachelab', 'type': '实验', 'status': 'not-submitted', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'attachment_url': 'your attachment_url'},
+    {'name': '代码优化', 'type': '普通作业', 'status': 'not-submitted', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'attachment_url': 'your attachment_url'},
+    {'name': '磁盘访问', 'type': '小测验', 'status': 'submitted', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'attachment_url': 'your attachment_url'},
+    {'name': '磁盘访问', 'type': '小测验', 'status': 'not-submitted', 'deadline': '2024-11-26 23:59:59', 'publish_time': '2024-11-19 20:54:30', 'description': 'your description', 'attachment_url': 'your attachment_url'},
 ]
 '''
     work_outline keys:
-        name: str  作业名
+        name: str  作业名(标题)
         type: str  作业类型
         status: str  作业状态  only('timeout', 'not-submitted', 'submitted')
         deadline:   截止日期 strftime('%Y-%m-%d %H:%M:%S')
         publish_time:   发布时间 strftime('%Y-%m-%d %H:%M:%S')
         description: str  作业描述
-        requirements: str  作业要求  (这俩需要当成一个key吗)
         attachment_url: str  附件url
 '''
 
 files = [
     {'src': f'data/ppt{i}.pptx', 'date': '2024-11-19 22:44:46'} for i in range(15)
 ]
-# 暂时的想法是： 在static下创建若干文件夹, src的路径只存放static/  后面的路径
-# eg. static/DBMS_cjc/src/第六章.ppt  ->  src = DBMS_cjc/第六章.ppt  （src类）
-#     static/DBMS_cjc/work_name/attachment.zip -> DBMS_cjc/work_name/attachment.zip
+# 暂时的想法是： 在static下创建若干文件夹, src的路径只存放load/  后面的路径
+# eg. load/DBMS_cjc/src/第六章.ppt  ->  src = DBMS_cjc/第六章.ppt  （src类）
+#     load/DBMS_cjc/work_name/attachment.zip -> DBMS_cjc/work_name/attachment.zip
+# name key取src的文件名
 for file in files:
     file['name'] = os.path.basename(file['src'])
 
@@ -228,19 +233,42 @@ def terms():
     return render_template('_markdown.html', content=html)
 
 @app.route('/home')
-def home():
+@app.route('/home/<course_name>')
+def home(course_name=None):
     if 'username' not in session:
         return redirect(url_for('index'))
-    #TODO
-    '''
-    task: 从数据库读取内容到courses,upload, 下面的tasks同理
-        known: username
-        need: 所有courses: list
-              所有upload: dict  (参考上面的courses,upload实例)
-    '''
+    
     username = session['username']
+    role = session['role']
 
-    return render_template('home.html', courses=courses, items=items, upload=upload)
+    # TODO
+    # 找出该用户所有的upload
+
+    switch_type = request.args.get('switch_type', None)
+    filtered_upload = upload.copy()
+
+    if course_name:
+        filtered_upload = [item for item in filtered_upload if item['course'] == course_name]
+    if switch_type:
+        if switch_type == 'work':
+            filtered_upload = [item for item in filtered_upload if 'work' in item]
+        elif switch_type == 'src':
+            filtered_upload = [item for item in filtered_upload if 'src' in item]
+
+    if role == 'teacher':
+        return render_template('home_teacher.html', 
+                            courses=courses, 
+                            items=items, 
+                            upload=upload,  # 接口还没改 
+                            course_name=course_name,
+                            switch_type=switch_type)
+    else:
+        return render_template('home.html', 
+                            courses=courses, 
+                            items=items, 
+                            upload=upload, 
+                            course_name=course_name,
+                            switch_type=switch_type)
 
 @app.route('/course/<string:course_name>')
 def course(course_name):
@@ -252,7 +280,16 @@ def course(course_name):
         need: 所有courses: list
     '''
     username = session['username']
+    role = session['role']
 
+    min_date = datetime.now().strftime('%Y-%m-%dT%H:%M')
+    if role == 'teacher':
+        return render_template('course_main_publish.html', courses=courses, course_name=course_name, min_date=min_date)
+    else:
+        return render_template('course_main.html', courses=courses, course_name=course_name)
+    
+@app.route('/Cnotice/<string:course_name>')  # 新增公告栏，做不做再说
+def Cnotice(course_name):
     return render_template('course_main.html', courses=courses, course_name=course_name)
 
 @app.route('/Cwork/<string:course_name>')
@@ -306,16 +343,137 @@ def chatBOT():
     # print(response.status_code)  DEBUG 连接状态
     re_dict = response.json()  # dict item
 
-    
-
 
     response = {
         'status': 'success',
-        'message': f'收到消息: {re_dict['response']}',  # demo
+        'message': f'{re_dict["response"]}',  # demo
         'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
         'username': username
     }
     return jsonify(response)
+
+@app.route('/courses_square')
+def courses_square():
+    return render_template('courses_square.html', courses=courses)
+
+
+@app.route('/upload_file/<course_name>/src', methods=['POST'])
+def upload_file(course_name):
+    if 'username' not in session or session['role'] != 'teacher':
+        return jsonify({
+            'status': 'error',
+            'message': '权限不足'
+        }), 403
+
+    if 'file' not in request.files:
+        return jsonify({
+            'status': 'error',
+            'message': '没有文件被上传'
+        }), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({
+            'status': 'error',
+            'message': '没有选择文件'
+        }), 400
+
+    course_folder = os.path.join(
+        app.config['UPLOAD_FOLDER'], 
+        f"{course_name}", 
+        'src'
+    )
+    os.makedirs(course_folder, exist_ok=True)
+    file_path = os.path.join(course_folder, file.filename)
+    file.save(file_path)
+    file_path = os.path.relpath(file_path, app.config['UPLOAD_FOLDER'])
+
+    # TODO
+    # parameters: course_name, file_path
+    # 上面的file_path例子： load/ICS/src/env.yml 存进数据库是只需要存 ICS/src/env.yml
+    # 这里还没有考虑ICS课多个老师开的情况, 课程名+老师名能不能做key, 如ICS_柴云鹏/src/env.yml
+    
+    return jsonify({
+        'status': 'success',
+        'message': '文件上传成功',
+        'file_path': file_path
+    })
+
+@app.route('/course/<course_name>/publish_work', methods=['POST'])
+def publish_work(course_name):
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': '请先登录'})
+        
+    homework_type = request.form.get('homework_type')
+    title = request.form.get('title')
+    description = request.form.get('content')
+    deadline = request.form.get('deadline')
+    publish_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+    print(publish_time)
+    print('deadline:', deadline)
+    # 数据验证
+    if not all([homework_type, title, description, deadline]):
+        return jsonify({
+            'success': False, 
+            'message': '请填写所有必填项'
+        })
+    
+    try:
+        deadline = datetime.strptime(deadline, '%Y-%m-%dT%H:%M')
+        attachment_path = None
+        file = request.files['attachment']
+        if file.filename != '':
+            homework_folder = os.path.join(
+                app.config['UPLOAD_FOLDER'],
+                course_name,
+                title
+            )
+            os.makedirs(homework_folder, exist_ok=True)
+            attachment_path = os.path.join(homework_folder, file.filename)
+            file.save(attachment_path)
+            print(f'path: {attachment_path}')
+        
+        if attachment_path:  # 只取load/后的内容
+            attachment_path = os.path.relpath(attachment_path, app.config['UPLOAD_FOLDER'])
+
+        # TODO: 添加数据库操作
+        # parameters: course_name, homework_type, title, description, deadline, publish_time [, attachment_path]
+        # deadline format: %Y-%m-%dT%H:%M
+        # publish_time format: %Y-%m-%dT%H:%M:%S
+        
+        
+        
+        return jsonify({
+            'success': True,
+            'message': '作业发布成功'
+        })
+        
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({
+            'success': False,
+            'message': '发布失败，请稍后重试'
+        })
+
+
+# 公告看看做不做
+@app.route('/course/<course_name>/publish_announcement', methods=['POST'])
+def publish_announcement(course_name):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+        
+    content = request.form.get('content')
+    if content:
+        print(f"公告: {content}")
+        return jsonify({
+            'status': 'success',
+            'message': '公告发布成功!',
+        })
+    
+    return jsonify({
+        'status': 'error',
+        'message': '公告内容不能为空'
+    }), 400
 
 
 if __name__ == '__main__':

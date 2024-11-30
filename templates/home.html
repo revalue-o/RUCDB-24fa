@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../static/css/header.css" />
     <link rel="stylesheet" href="../static/css/home_container.css" />
     <link rel="stylesheet" href="../static/css/pagination.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- <link rel="stylesheet" href="../static/css/chat.css" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" /> -->
 </head>
@@ -19,20 +20,21 @@
         <div class="header">
             <div class="header-bar">
                 <div class="left-entry">
-                    <a href="#" class="left-item">首页</a>
+                    <a href="{{ url_for('home') }}" class="left-item">首页</a>
                     <a href="#" class="left-item" id="course-trigger">课程</a>
                     <div class="is-bottom" style="margin-left: 0px">
                         <div class="pop-content">
                             <div class="msg-entry">
                                 <div class="msg-list">
                                     {% for course in courses[:8] %}
-                                    <a class="msg-item" href="{{ url_for('course', course_name=course) }}">{{ course }}</a>
+                                    <a class="msg-item" href="{{ url_for('course', course_name=course) }}">{{ course
+                                        }}</a>
                                     {% endfor %}
                                     {% if courses|length > 8 %}
                                     <div class="msg-item">...</div>
                                     {% endif %}
                                     <div class="divider"></div>
-                                    <a class="msg-item" href="#">课程广场</a>
+                                    <a class="msg-item" href="{{ url_for('courses_square') }}">课程广场</a>
                                 </div>
                             </div>
                         </div>
@@ -48,7 +50,21 @@
                     <a href="#" class="left-item">小组</a>
                 </div>
                 <div class="right-entry">
-                    <a href="#">{{ session.username }}</a>
+                    <a href="#" class="right-item">{{ session.username }}</a>
+
+                    <a href="#" id="message-trigger" class="right-item"><i class="fas fa-paper-plane"
+                            style="color: transparent; -webkit-text-stroke: 1px white;"></i></a>
+                    <div class="is-bottom" style="margin-left: 0;">
+                        <div class="pop-content">
+                            <div class="msg-entry">
+                                <div class="msg-list">
+                                    <a class="msg-item">回复我的</a>
+                                    <a class="msg-item">我发出的</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
             <div class="header-inner">
@@ -67,28 +83,32 @@
             <div class="course-sidebar">
                 <div class="sidebar-header">
                     <i class="icon-book"></i>
-                    <span>我的课程</span>
+                    <a href="{{ url_for('home') }}">我的课程</a>
                 </div>
                 <div class="course-list">
                     {% for course in courses[:12] %}
-                    <a class="msg-item" href="{{ url_for('course', course_name=course) }}">{{ course }}</a>
+                    <a class="msg-item {% if course_name == course %}active{% endif %}"
+                        href="{{ url_for('home', course_name=course, switch_type=switch_type) }}">{{ course }}</a>
                     {% endfor %}
                     {% if courses|length > 12 %}
                     <div class="msg-item">...</div>
                     {% endif %}
                     <div class="divider"></div>
-                    <a class="msg-item" href="#">课程广场</a>
+                    <a class="msg-item" href="{{ url_for('courses_square') }}">课程广场</a>
                 </div>
             </div>
 
             <!-- 右侧内容区 -->
             <div class="content-area">
                 <div class="content-nav">
-                    <a href="#" class="active">全部</a>
+                    <a href="{{ url_for('home', course_name=course_name) }}" 
+                        class="{{ 'active' if not switch_type else '' }}">全部</a>
                     <a href="#">问答</a>
                     <a href="#">公告</a>
-                    <a href="#">作业</a>
-                    <a href="#">课件</a>
+                    <a href="{{ url_for('home', course_name=course_name, switch_type='work') }}"
+                        class="{{ 'active' if switch_type == 'work' else '' }}">作业</a>
+                    <a href="{{ url_for('home', course_name=course_name, switch_type='src') }}" 
+                        class="{{ 'active' if switch_type == 'src' else '' }}">课件</a>
                     <a href="#">大纲</a>
                 </div>
                 <div class="content-list" id="content-list">
@@ -99,20 +119,20 @@
                     <div class="content-item">
                         {% if 'src' in item %}
                         <div>
-                            <a href="#">{{ item.name }}</a>
+                            <a href="{{ url_for('Csrc', course_name=item.course) }}">{{ item.name }}</a>
                             <span>在</span>
-                            <a href="#">{{ item.course }}</a>
+                            <a href="{{ url_for('Csrc', course_name=item.course) }}">{{ item.course }}</a>
                             <span>上传了课件</span>
                         </div>
-                        <a href="#">{{ item.src }}</a>
+                        <a href="{{ url_for('Csrc', course_name=item.course) }}">{{ item.src }}</a>
                         {% elif 'work' in item %}
                         <div>
-                            <a href="#">{{ item.name }}</a>
+                            <a href="{{ url_for('Cwork', course_name=item.course) }}">{{ item.name }}</a>
                             <span>在</span>
-                            <a href="#">{{ item.course }}</a>
+                            <a href="{{ url_for('Cwork', course_name=item.course) }}">{{ item.course }}</a>
                             <span>布置了作业</span>
                         </div>
-                        <a href="#">{{ item.work }}</a>
+                        <a href="{{ url_for('Cwork', course_name=item.course) }}">{{ item.work }}</a>
                         {% endif %}
                     </div>
                     {% endfor %}

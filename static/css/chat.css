@@ -61,6 +61,7 @@
     display: flex;  /* 使用flex布局 */
     gap: 10px;  /* 设置间距 */
     align-items: flex-end;  /* 底部对齐 */
+    position: relative;
 }
 
 .chat-input {
@@ -166,3 +167,31 @@
     flex-direction: column;
     background-color: white; 
 }
+
+.clear-chat-btn {
+    position: absolute;
+    right: 15px;  /* 与发送按钮左对齐 */
+    bottom: 65px;  
+    width: 40px;   /* 与发送按钮同宽 */
+    height: 40px;  /* 与发送按钮同高 */
+    background-color: #7dbeba;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.clear-chat-btn:hover {
+    background-color: #39C5BB;
+    color: white;
+}
+
+.clear-chat-btn .material-icons {
+    font-size: 24px;
+}
+

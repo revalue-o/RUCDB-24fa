@@ -64,6 +64,11 @@ body {
     margin-bottom: 10px;
 }
 
+.sidebar-header a {
+    text-decoration: none;
+    color: white;
+}
+
 .course-list {
     display: flex;
     flex-direction: column;

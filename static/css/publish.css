@@ -1,0 +1,110 @@
+.main-content {
+    display: flex;  /* 使导航栏和内容区域水平排列 */
+    min-height: 100vh;
+}
+
+.right-content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;  /* 内容区域垂直排列 */
+    gap: 20px;
+}
+
+.content-section {
+    width: 100%;
+    background: white;
+    border-radius: 4px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    border: 1px solid #39c5bb;
+}
+
+.content-section h3 {
+    margin-bottom: 10px;
+}
+
+.announcement-section textarea,
+.homework-section textarea {
+    width: 100%;
+    min-height: 150px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.upload-section .upload-area {
+    border: 2px dashed #ddd;
+    background: #f8f9fa;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.homework-section .form-group {
+    margin-bottom: 10px;
+}
+
+.homework-section select,
+.homework-section input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.editor-toolbar {
+    border: 1px solid #ddd;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+.file-input {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.datetime-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+/* 美化日期时间选择器的外观（针对不同浏览器） */
+.datetime-input::-webkit-calendar-picker-indicator {
+    padding: 2px;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.datetime-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* 确保选择器在所有浏览器中都有合适的高度 */
+.datetime-input::-webkit-datetime-edit {
+    padding: 0;
+}

@@ -34,6 +34,10 @@ body {
     border-radius: 4px 4px 0 0;
 }
 
+.course-title a {
+    color: white;
+}
+
 .menu-list {
     padding: 10px 0;
 }
@@ -62,6 +66,73 @@ body {
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
+}
+
+
+/* 课程切换区域 */
+.course-switch {
+    margin-top: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 4px;
+}
+
+.switch-title {
+    color: #2c3e50;
+    font-weight: bold;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.course-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.course-list a {
+    text-decoration: none;
+    position: relative;
+}
+
+.course-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 10px 0 10px 10px;
+    color: #61666D;
+    text-align: left;
+    font-size: 14px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.course-item:hover {
+    background-color: #e3e5e7;
+}
+
+.course-list a.active {
+    color: #3498db;
+}
+
+
+.right-content {
+    flex: 1;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.content-header {
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.content-body {
+    padding: 20px 0;
+    color: #666;
 }
 
 /* 右侧内容区 */
@@ -131,37 +202,6 @@ body {
     color: #ffffff;  /* 白色文字以提高对比度 */
     font-weight: 600;
     letter-spacing: 0.5px;
-}
-/* 课程切换区域 */
-.course-switch {
-    margin-top: 20px;
-    padding: 15px;
-    background: white;
-    border-radius: 4px;
-}
-
-.switch-title {
-    color: #2c3e50;
-    font-weight: bold;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
-}
-
-.course-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px 0;
-}
-
-.course-list a {
-    color: #666;
-    text-decoration: none;
-    padding: 5px 0;
-}
-
-.course-list a.active {
-    color: #3498db;
 }
 
 /* 实验作业特殊样式 */

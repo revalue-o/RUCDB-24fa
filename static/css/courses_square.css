@@ -1,0 +1,113 @@
+.content {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.notice {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #666;
+}
+
+.notice span {
+    color: #ff4d4f;
+}
+
+.time-select {
+    margin-bottom: 30px;
+}
+
+.time-select label {
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+.time-select select {
+    padding: 8px 15px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: #39c5bb;
+    color: white;
+    min-width: 200px;
+}
+
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px;
+}
+
+.course-card {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    background-color: white;
+    transition: transform 0.2s, box-shadow 0.2s;
+    max-width: 160px;
+}
+
+.course-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.course-title {
+    font-size: 15px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.teacher-name {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.join-btn {
+    background-color: #5dc6bf;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 13px;
+}
+
+.join-btn:hover {
+    background-color: #18b2aa;
+}
+
+@media screen and (max-width: 1200px) {
+    .course-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .course-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .course-grid {
+        grid-template-columns: 1fr;
+    }
+}
