@@ -798,6 +798,15 @@ class DatabaseManager:
             work_load.append({"course":i[0],"name":i[1],"deadline":i[2],"profile":i[3],"path":i[4]})
         return work_load
     
+#下面这个函数是dhl写的，用于执行sql语句来测试
+    def testSQL(self):
+        # query = f"select * from course,class where class.courseno=course.courseno;"
+        query = f"select * from handout;"
+        self._cursor.execute(query)
+        src=self._cursor.fetchall()
+        print(src)
+        self._connection.commit()
+    
 '''
 TODO:
 1.select_info_home函数仅考虑了学生的情况，应该增加对教师的查询
