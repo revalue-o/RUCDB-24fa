@@ -71,7 +71,8 @@
                 </div>
                 <div class="course-list">
                     {% for course in courses[:12] %}
-                    <a class="msg-item {{ 'active' if course_name == course else '' }}" href="{{ url_for('home', course_name=course) }}">{{ course }}</a>
+                    <a class="msg-item {% if course_name == course %}active{% endif %}"
+                        href="{{ url_for('home', course_name=course, switch_type=switch_type) }}">{{ course }}</a>
                     {% endfor %}
                     {% if courses|length > 12 %}
                     <div class="msg-item">...</div>
@@ -84,11 +85,14 @@
             <!-- 右侧内容区 -->
             <div class="content-area">
                 <div class="content-nav">
-                    <a href="#" class="active">全部</a>
+                    <a href="{{ url_for('home', course_name=course_name) }}" 
+                        class="{{ 'active' if not switch_type else '' }}">全部</a>
                     <a href="#">问答</a>
                     <a href="#">公告</a>
-                    <a href="#">作业</a>
-                    <a href="#">课件</a>
+                    <a href="{{ url_for('home', course_name=course_name, switch_type='work') }}"
+                        class="{{ 'active' if switch_type == 'work' else '' }}">作业</a>
+                    <a href="{{ url_for('home', course_name=course_name, switch_type='src') }}" 
+                        class="{{ 'active' if switch_type == 'src' else '' }}">课件</a>
                     <a href="#">大纲</a>
                 </div>
                 <div class="content-list" id="content-list">
