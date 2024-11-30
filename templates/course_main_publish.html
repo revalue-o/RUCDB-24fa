@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程管理</title>
+    <link rel="stylesheet" href="../static/css/home.css" />
+    <link rel="stylesheet" href="../static/css/normalize.css" />
+    <link rel="stylesheet" href="../static/css/header.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="../static/css/publish.css" />
+    <link rel="stylesheet" href="../static/css/course_main.css" />
+</head>
+
+<body>
+    <div class="container">
+        <!-- 顶部导航栏 -->
+        <div class="header">
+            <div class="header-bar">
+                <div class="left-entry">
+                    <a href="/home" class="left-item">首页</a>
+                    <a href="#" class="left-item" id="course-trigger">课程</a>
+                    <div class="is-bottom" style="margin-left: 0px">
+                        <div class="pop-content">
+                           <div class="msg-entry">
+                                <div class="msg-list">
+                                   {% for course in courses[:8] %}
+                                    <a class="msg-item" href="{{ url_for('course', course_name=course) }}">{{ course
+                                        }}</a>
+                                    {% endfor %}
+                                    {% if courses|length > 8 %}
+                                    <div class="msg-item">...</div>
+                                    {% endif %}
+                                    <div class="divider"></div>
+                                    <a class="msg-item" href="{{ url_for('courses_square') }}">课程广场</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href=#" class="left-item">问答</a>
+                    <a href="#" class="left-item">小组</a>
+                </div>
+                <div class="right-entry">
+                    <a href="#">{{ session.username }}</a>
+                </div>
+            </div>
+            <div class="header-inner">
+                <div class="banner">
+                    <div id="app">loading...</div>
+                </div>
+                <div class="banner-inner">
+                    <a href="https://www.bilibili.com/" class="inner-logo">
+                        <span class="logo-text">Unicourse</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- 左侧菜单 -->
+            <div class="left-menu">
+                <div class="course-title">
+                    <i class="icon-home"></i>
+                    <a href={{ url_for('course', course_name=course_name) }}">{{ course_name }}</a>
+                </div>
+
+                <div class="menu-list">
+                    <a href="{{ url_for('Cnotice', course_name=course_name) }}" class="menu-item">
+                        <i class="icon-announcement"></i>
+                        <span>公告</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="icon-qa"></i>
+                        <span>问答</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="icon-group"></i>
+                        <span>小组</span>
+                    </a>
+                    <a href="{{ url_for('Cwork', course_name=course_name) }}" class="menu-item">
+                        <i class="icon-homework"></i>
+                        <span>作业</span>
+                    </a>
+                    <a href="{{ url_for('Csrc', course_name=course_name) }}" class="menu-item">
+                        <i class="icon-files"></i>
+                        <span>课件</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="icon-outline"></i>
+                        <span>课程大纲</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="icon-comment"></i>
+                        <span>匿名吐槽区</span>
+                    </a>
+                </div>
+
+                <!-- 课程切换区域 -->
+                <div class="course-switch">
+                    <div class="switch-title">课程切换</div>
+                    <div class="course-list">
+                        {% for course in courses[:8] %}
+                        <a class="course-item" href="{{ url_for('course', course_name=course) }}">{{ course }}</a>
+                        {% endfor %}
+                        {% if courses|length > 8 %}
+                        <div class="course-item">...</div>
+                        {% endif %}
+                        <div class="divider"></div>
+                        <a class="course-item" href="{{ url_for('courses_square') }}">课程广场</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧内容区域 -->
+            <div class="right-content">
+                <!-- 发布公告部分 -->
+                <div class="content-section announcement-section">
+                    <h3>发布公告</h3>
+                    <form id="announcement-form" method="POST"
+                        action="{{ url_for('publish_announcement', course_name=course_name) }}">
+                        <textarea name="content" placeholder="在此输入公告内容..." required></textarea>
+                        <button type="submit" class="btn" style="background-color: #39c5bb;">发布</button>
+                    </form>
+                </div>
+
+                <!-- 上传课件部分 -->
+                <div class="content-section upload-section">
+                    <h3>上传课件</h3>
+                    <div class="upload-area">
+                        <button class="btn" id="selectFileBtn" style="background-color: #39c5bb;">点击选择文件</button>
+                        <input type="file" id="fileInput" hidden>
+                    </div>
+                </div>
+
+                <!-- 布置新作业部分 -->
+                <div class="content-section homework-section">
+                    <h3>布置新作业</h3>
+                    <form id="homework-form">
+                        <div class="form-group">
+                            <label>类型</label>
+                            <select name="homework_type" required>
+                                <option value="">--- 请选择布置作业的类型 ---</option>
+                                <option value="实验">实验</option>
+                                <option value="小测验">小测验</option>
+                                <option value="普通作业">普通作业</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>标题</label>
+                            <input type="text" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>描述</label>
+                            <textarea name="content" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>截止时间</label>
+                            <input type="datetime-local" 
+                                   name="deadline" 
+                                   required 
+                                   min="{{ min_date }}"
+                                   class="datetime-input">
+                        </div>
+                        <div class="form-group">
+                            <label>附件</label>
+                            <input type="file" name="attachment" class="file-input">
+                        </div>
+                        <button type="submit" class="btn" style="background-color: #39c5bb;">发布作业</button>
+                    </form>
+                </div>
+            </div>
+
+            {% include "_chat.html" %}
+        </div>
+    </div>
+</body>
+
+<script type="module" src="{{ url_for('static', filename='js/home.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/scroll.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/publish_announcement.js') }}"></script>
+<script>const courseName = "{{ course_name }}";</script>
+<script type="module" src="{{ url_for('static', filename='js/publish_src.js')}}"></script>
+<script type="module" src="{{ url_for('static', filename='js/publish_work.js')}}"></script>
+
+</html>

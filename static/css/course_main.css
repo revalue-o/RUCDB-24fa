@@ -6,40 +6,13 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    line-height: 1.5;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: #f5f5f5;
+    color: #333;
 }
 
-/* 顶部导航栏 */
-.top-nav {
-    background-color: #2c3e50;
-    height: 50px;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 20px;
-    align-items: center;
-    color: white;
-}
 
-.nav-left, .nav-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.top-nav a {
-    color: white;
-    text-decoration: none;
-    padding: 5px 10px;
-}
-
-.logo {
-    font-weight: bold;
-    font-size: 1.2em;
-}
-
-/* 主体内容 */
+/* 主体内容布局 */
 .main-content {
     display: flex;
     margin: 20px;
@@ -61,6 +34,10 @@ body {
     border-radius: 4px 4px 0 0;
 }
 
+.course-title a {
+    color: white;
+}
+
 .menu-list {
     padding: 10px 0;
 }
@@ -69,21 +46,35 @@ body {
     display: flex;
     align-items: center;
     padding: 10px 15px;
-    color: #333;
+    color: #666;
     text-decoration: none;
     gap: 10px;
 }
 
 .menu-item:hover {
-    background-color: #f5f5f5;
+    background-color: #c6ecec;
 }
+
+.menu-item.active {
+    /* background-color: #f0f0f0; */
+    color: #39C5BB;
+    position: relative;
+}
+.menu-item.active::after {
+    content: '\27A4';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
 
 /* 课程切换区域 */
 .course-switch {
     margin-top: 20px;
+    padding: 15px;
     background: white;
     border-radius: 4px;
-    padding: 15px;
 }
 
 .switch-title {
@@ -101,16 +92,31 @@ body {
 }
 
 .course-list a {
-    color: #666;
     text-decoration: none;
-    padding: 5px 0;
+    position: relative;
 }
 
-.course-list a:hover {
+.course-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 10px 0 10px 10px;
+    color: #61666D;
+    text-align: left;
+    font-size: 14px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.course-item:hover {
+    background-color: #e3e5e7;
+}
+
+.course-list a.active {
     color: #3498db;
 }
 
-/* 右侧内容区 */
+
 .right-content {
     flex: 1;
     background: white;
@@ -127,11 +133,4 @@ body {
 .content-body {
     padding: 20px 0;
     color: #666;
-}
-
-/* 图标样式 - 这里需要根据实际使用的图标库来调整 */
-[class^="icon-"] {
-    width: 16px;
-    height: 16px;
-    display: inline-block;
 }

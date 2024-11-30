@@ -30,7 +30,7 @@
                                     <div class="msg-item">...</div>
                                     {% endif %}
                                     <div class="divider"></div>
-                                    <a class="msg-item" href="#">课程广场</a>
+                                    <a class="msg-item" href="{{ url_for('courses_square') }}">课程广场</a>
                                 </div>
                             </div>
                         </div>
@@ -59,11 +59,11 @@
             <div class="left-menu">
                 <div class="course-title">
                     <i class="icon-home"></i>
-                    <span>{{ course_name }}</span>
+                    <a href="{{ url_for('course', course_name=course_name) }}">{{ course_name }}</a>
                 </div>
 
                 <div class="menu-list">
-                    <a href="{{ url_for('course', course_name=course_name) }}" class="menu-item">
+                    <a href="{{ url_for('Cnotice', course_name=course_name) }}" class="menu-item">
                         <i class="icon-announcement"></i>
                         <span>公告</span>
                     </a>
@@ -98,13 +98,13 @@
                     <div class="switch-title">课程切换</div>
                     <div class="course-list">
                         {% for course in courses[:8] %}
-                        <a class="msg-item" href="{{ url_for('course', course_name=course) }}">{{ course }}</a>
+                        <a class="course-item" href="{{ url_for('Cnotice', course_name=course) }}">{{ course }}</a>
                         {% endfor %}
                         {% if courses|length > 8 %}
-                        <div>...</div>
+                        <div class="course-item">...</div>
                         {% endif %}
                         <div class="divider"></div>
-                        <a class="msg-item" href="#">课程广场</a>
+                        <a class="course-item" href="{{ url_for('courses_square') }}">课程广场</a>
                     </div>
                 </div>
             </div>

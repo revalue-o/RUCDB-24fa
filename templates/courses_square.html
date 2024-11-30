@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>课程广场</title>
+    <link rel="stylesheet" href="../static/css/courses_square.css">
+    <link rel="stylesheet" href="../static/css/home.css" />
+    <link rel="stylesheet" href="../static/css/normalize.css" />
+    <link rel="stylesheet" href="../static/css/header.css" />
+</head>
+
+<body>
+    <div class="container">
+        <!-- 顶部导航栏 -->
+        <div class="header">
+            <div class="header-bar">
+                <div class="left-entry">
+                    <a href="/home" class="left-item">首页</a>
+                    <a href="#" class="left-item" id="course-trigger">课程</a>
+                    <div class="is-bottom" style="margin-left: 0px">
+                        <div class="pop-content">
+                            <div class="msg-entry">
+                                <div class="msg-list">
+                                    {% for course in courses[:8] %}
+                                    <a class="msg-item" href="{{ url_for('course', course_name=course) }}">{{ course }}</a>
+                                    {% endfor %}
+                                    {% if courses|length > 8 %}
+                                    <div class="msg-item">...</div>
+                                    {% endif %}
+                                    <div class="divider"></div>
+                                    <a class="msg-item" href="{{ url_for('courses_square') }}">课程广场</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#" class="left-item">问答</a>
+                    <a href="#" class="left-item">小组</a>
+                </div>
+                <div class="right-entry">
+                    <a href="#">{{ session.username }}</a>
+                </div>
+            </div>
+            <div class="header-inner">
+                <div class="banner">
+                    <div id="app">loading...</div>
+                </div>
+                <div class="banner-inner">
+                    <a href="https://www.bilibili.com/" class="inner-logo">
+                        <span class="logo-text">Unicourse</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="title">
+                <h1>课程广场</h1>
+            </div>
+    
+            <div class="notice">
+                提示: 以下课程是按照<span>创建时间</span>, 从新到老排序的。<br>
+                建议使用<span>ctrl+F</span>或<span>command+F</span>查找课程或任课教师, 搜索功能将近期上线)
+            </div>
+    
+            <div class="time-select">
+                <label>请选择开课时间：</label>
+                <select>
+                    <option selected>全部</option>
+                    <option>2024春季</option>
+                    <option>2024秋季</option>
+                </select>
+            </div>
+    
+            <div class="course-grid">
+                <!-- 课程卡片示例 -->
+                 {% for i in range(10) %}
+                <div class="course-card">
+                    <div class="course-title">PS秋季实战秋季实战秋季实战秋季实战</div>
+                    <div class="teacher-name">谢红</div>
+                    <button class="join-btn">申请加入</button>
+                </div>
+                {% endfor %}
+    
+                <!-- 可以继续添加更多课程卡片 -->
+                {% include "_chat.html" %}
+            </div>
+        </div>
+
+    </div>
+    
+</body>
+
+<script type="module" src="{{ url_for('static', filename='js/home.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/scroll.js') }}"></script>
+</html>

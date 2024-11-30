@@ -66,9 +66,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
+    const chatContent = document.getElementById('chatContent');
     const chatInput = document.getElementById('chatInput');
     const sendButton = document.getElementById('sendMessage');
 
+    function loadChatHistory() {
+        const chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+        chatHistory.forEach(msg => {
+            appendMessage(msg.content, msg.type, false);
+        });
+        // 滚动到最新消息
+        chatContent.scrollTop = chatContent.scrollHeight;
+    }
+
+    // 保存消息到 localStorage
+    function saveChatHistory(message, type) {
+        const chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+        chatHistory.push({
+            content: message,
+            type: type,
+            timestamp: new Date().getTime()
+        });
+        // 可以限制历史记录数量，比如只保留最近50条
+        if (chatHistory.length > 50) {
+            chatHistory.shift();
+        }
+        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+    }
+
+    // 修改 appendMessage 函数
+    function appendMessage(message, type, save = true) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}-message`;
+        messageDiv.textContent = message;
+        chatContent.appendChild(messageDiv);
+        
+        // 滚动到最新消息
+        chatContent.scrollTop = chatContent.scrollHeight;
+        
+        // 保存到本地存储
+        if (save) {
+            saveChatHistory(message, type);
+        }
+    }
     // 发送消息的函数
     async function sendMessage() {
         const message = chatInput.value.trim();
@@ -115,14 +155,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 添加消息到聊天框的函数
-    function appendMessage(message, type) {
-        const chatContent = document.getElementById('chatContent');
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${type}-message`;
-        messageDiv.textContent = message;
-        chatContent.appendChild(messageDiv);
-        // 滚动到最新消息
-        chatContent.scrollTop = chatContent.scrollHeight;
+    function addClearButton() {
+        const clearButton = document.createElement('button');
+        // 使用 Material Icons 的删除图标替代文本
+        clearButton.innerHTML = '<span class="material-icons">cleaning_services</span>';
+        clearButton.className = 'clear-chat-btn';
+        clearButton.onclick = function() {
+            localStorage.removeItem('chatHistory');
+            chatContent.innerHTML = '<h4 style="border-bottom: 1px solid #e0e0e0; padding-bottom: 10px; margin-bottom: 15px;">CHAT</h4>';
+        };
+        chatContent.parentElement.insertBefore(clearButton, chatContent);
     }
+
+    loadChatHistory();
+    addClearButton();
 });
