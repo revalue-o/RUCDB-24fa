@@ -35,7 +35,32 @@ def test_add_teacher():
         myDB.add_teacher("202200"+str(i).zfill(4),"123456","test_teacher"+str(i))
 def test_inspect_tea_info():
     pass
-
+def test_add_course():
+    for i in range(15):
+        myDB.add_course("test_course_"+str(i))
+def test_add_class():
+    for i in range(10):
+        myDB.add_class("test_class_"+str(i),"2024"+str(i),i+1)
+def test_add_student2class():
+    for i in range(8):
+        myDB.student_join_class("202100"+str(i).zfill(4),"test_class_"+str(i/2))
+        myDB.student_join_class("202100"+str(i+1).zfill(4),"test_class_"+str(i/2))
+def test_add_teacher2class():
+    for i in range(8):
+        myDB.teacher_join_class("202200"+str(i).zfill(4),"test_class_"+str(i/2))
+        myDB.teacher_join_class("202200"+str(i+1).zfill(4),"test_class_"+str(i/2))
+def test_addhandout2class():
+    for i in range(10):
+        myDB.post_handout("test_class_"+str(i/2),"test_handout_"+str(i),"test_handout_"+str(i)+".txt")
+        myDB.post_handout("test_class_"+str(i/2),"test_handout_"+str(i+1),"test_handout_"+str(i+1)+".txt")
+def collective_class_func_test():
+    #数据库里保存的“文件”都只是文件路径
+    test_add_class()
+    test_add_student2class()
+    test_add_teacher2class()
+        
+    
+ 
     
 def add_course_test():
     result_1=myDB.add_course("test_course")
