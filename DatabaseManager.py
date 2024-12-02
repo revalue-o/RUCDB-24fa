@@ -757,14 +757,14 @@ class DatabaseManager:
         返回结果：返回包含上述信息的字典列表。
         '''
         query_src = (
-            f"SELECT cour1.coursename, hand1.hname,ph1.post_handout_time,hand1.hfilepath"
+            f"SELECT cour1.coursename, hand1.hname,ph1.post_handout_time,hand1.hfilepath "
             f"FROM attend_class at1, course cour1, class cla1, post_handout ph1, handout hand1 "
             f"WHERE at1.sno = '{sno}' "
             f"AND cla1.cno = at1.cno "
             f"AND cour1.courseno = cla1.courseno "
             f"AND ph1.cno = at1.cno "
-            f"AND ph1.hno = hand1.hno"
-            f"AND cour1.coursename LIKE {course_name}"
+            f"AND ph1.hno = hand1.hno "
+            f"AND cour1.coursename LIKE '{course_name}'"
         )
         try:
             self._cursor.execute(query_src)
@@ -778,14 +778,14 @@ class DatabaseManager:
         return files
     def select_student_work(self,sno,course_name):
         query_work = (
-            f"SELECT  cour1.coursename, ass1.aname ,ass1.adeadline,ass1.aprofile,ass1.afilepath"
-            f"FROM attend_class at1, course cour1, class cla1, post_assignment pa1, assignment ass1 "
+            f"SELECT  cour1.coursename, ass1.aname ,ass1.adeadline,ass1.aprofile,ass1.afilepath "
+            f"FROM attend_class at1, course cour1, class cla1, post_assignment pa1, teach_class tc1,assignment ass1 "
             f"WHERE at1.sno = '{sno}' "
             f"AND cla1.cno = at1.cno "
             f"AND cour1.courseno = cla1.courseno "
             f"AND pa1.cno = tc1.cno "
-            f"AND pa1.ano = ass1.ano"
-            f"AND cour1.coursename LIKE {course_name};"
+            f"AND pa1.ano = ass1.ano "
+            f"AND cour1.coursename LIKE '{course_name}';"
         )
         try:
             self._cursor.execute(query_work)
