@@ -131,7 +131,7 @@ def add_course():
         # if course_name and course_description:
         #     # 存储课程信息
         #     courses[course_name] = {'description': course_description}
-        result=myDB.add_course(course_name)
+        result=myDB.add_course_and_class(course_name)
         if result==0:
             #courses[course_name] = {'description': 'fixed test str'}# 这一行是临时的，当从数据库中读取课程的API完成后将采用对应的API
             return redirect(url_for('course_page', course_name=course_name))

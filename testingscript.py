@@ -111,15 +111,20 @@ def add_course_test():
 #     pass
 
 # myDB.truncate_tables()
-myDB.drop_tables()
-myDB.create_tables()
-test_student()
+# myDB.drop_tables()
+# myDB.create_tables()
+# test_student()
 
 
-collective_class_func_test()
+# collective_class_func_test()
 
-# def sql():
-#     myDB.testSQL()
-# sql()
+def sql():
+    myDB.testSQL()
+sql()
+i=66
+# myDB.add_student("202100"+str(i).zfill(4),"123456","test_student"+str(i))
+# myDB.add_student_to_class("test_class_0","123","2021000066")
+myDB.add_course_and_class("11451419190")
+sql()
 
 
