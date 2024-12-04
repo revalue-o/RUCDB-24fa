@@ -818,9 +818,9 @@ class DatabaseManager:
         query=f"select cno from class where cname='{cname}';"
         self._cursor.execute(query)
         src=self._cursor.fetchall()
-        print("src:  ",src)
+        # print("src:  ",src)
         cno=int(src[0][0])
-        print(type(cno))
+        # print(type(cno))
         self.student_join_class(sno,cno)
         self._connection.commit()
     
