@@ -746,7 +746,6 @@ class DatabaseManager:
         pass
     def select_student_src(self,sno,course_name):
         '''
-
         :param sno:
         :param course_name:
         :return:
@@ -801,16 +800,31 @@ class DatabaseManager:
 #下面这个函数是dhl写的，用于执行sql语句来测试
     def testSQL(self):
         # query = f"select * from course,class where class.courseno=course.courseno;"
-        query = f"select * from handout;"
+        query = f"select * from class;"
         self._cursor.execute(query)
         src=self._cursor.fetchall()
         print(src)
         self._connection.commit()
     
-'''
-TODO:
-1.select_info_home函数仅考虑了学生的情况，应该增加对教师的查询
-2.负责对接的后端需要过滤特殊字符，防止SQL注入
-3.需要增加获取课程信息的接口，便于前端做出教师用户添加教学班的下拉菜单（总不能遍历所有学生来找出所有课程吧）
-4.对于handout同3，感觉应该写一个针对教师用户的hangout查询接口
-'''
+    '''
+    TODO:
+    1.select_info_home函数仅考虑了学生的情况，应该增加对教师的查询
+    2.负责对接的后端需要过滤特殊字符，防止SQL注入
+    3.需要增加获取课程信息的接口，便于前端做出教师用户添加教学班的下拉菜单（总不能遍历所有学生来找出所有课程吧）
+    4.对于handout同3，感觉应该写一个针对教师用户的hangout查询接口
+    '''
+
+    def add_student_to_class(self,cname,cteacher,sno):
+        query=f"select cno from class where cname='{cname}';"
+        self._cursor.execute(query)
+        src=self._cursor.fetchall()
+        print("src:  ",src)
+        cno=int(src[0][0])
+        print(type(cno))
+        self.student_join_class(sno,cno)
+        self._connection.commit()
+    
+    '''
+    接受cname（教学班名），cteacher（教学的老师），sno（学生学号）功能为添加该学生到该教学班
+    '''
+    #还有一个任务是修改add_course的前端使得加课程的时候顺便加教学班
