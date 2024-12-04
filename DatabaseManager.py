@@ -828,3 +828,29 @@ class DatabaseManager:
     接受cname（教学班名），cteacher（教学的老师），sno（学生学号）功能为添加该学生到该教学班
     '''
     #还有一个任务是修改add_course的前端使得加课程的时候顺便加教学班
+    def add_course_and_class(self,coursename):
+        '''
+        添加一门课程，同时添加对应的教学班，教学班名称=课程名+yyyy+学期
+        '''
+        if len(coursename) > 32:
+            self._print_debug("添加课程失败.")
+            return 1
+
+        query = f"insert into course (coursename) values ('{coursename}');"
+        self._cursor.execute(query)
+        self._connection.commit()
+        self._print_debug("添加课程成功.")
+        
+        query = f"select courseno from course where coursename='{coursename}';"
+        self._cursor.execute(query)
+        src=self._cursor.fetchall()
+        courseno=int(src[0][0])
+        cname=coursename+"20241"#暂定这样的一一对应关系
+        csemester="20241"
+        query = f"insert into class (cname, csemester, courseno) values ('{cname}', '{csemester}', '{courseno}')"
+        self._cursor.execute(query)
+        self._connection.commit()
+        self._print_debug("添加教学班成功.")
+        return 0
+
+        
