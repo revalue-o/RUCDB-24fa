@@ -56,7 +56,7 @@ def login():
 #         # 简单的验证逻辑
 #         if (username == 'amin' or username == 'student') and password == 'password':
 #             session['username'] = username
-#             return redirect(url_for('home'))
+#             return redirecturl_for('home'))
 
 #     return render_template('login.html')
 
@@ -128,10 +128,11 @@ def add_course():
     if request.method == 'POST':
         course_name = request.form.get('course_name')
         course_description = request.form.get('course_description')
+        tno = session['username']
         # if course_name and course_description:
         #     # 存储课程信息
         #     courses[course_name] = {'description': course_description}
-        result=myDB.add_course_and_class(course_name)
+        result=myDB.add_course_and_class(course_name,tno)
         if result==0:
             #courses[course_name] = {'description': 'fixed test str'}# 这一行是临时的，当从数据库中读取课程的API完成后将采用对应的API
             return redirect(url_for('course_page', course_name=course_name))
@@ -173,8 +174,6 @@ courses = [
     '数学分析',
     '线性代数'
 ]
-
-items = [f"item{i}" for i in range(12)]
 
 upload = [
     {'name': 'cjc', 'course': 'DBMS', 'src': '第六章.ppt'}, # 这里只需要最后的文件名
@@ -243,6 +242,12 @@ def home(course_name=None):
 
     # TODO
     # 找出该用户所有的upload
+    if role == 'teacher':
+        courses = myDB.select_info_teacher_all_class(tno=username)
+        _, upload = myDB.select_info_teacher_home(tno=username)
+    else:
+        courses = myDB.select_class_student(sno=username)
+        _, upload = myDB.select_info_home(sno=username)
 
     switch_type = request.args.get('switch_type', None)
     filtered_upload = upload.copy()
@@ -258,15 +263,13 @@ def home(course_name=None):
     if role == 'teacher':
         return render_template('home_teacher.html', 
                             courses=courses, 
-                            items=items, 
-                            upload=upload,  # 接口还没改 
+                            upload=filtered_upload,  
                             course_name=course_name,
                             switch_type=switch_type)
     else:
         return render_template('home.html', 
                             courses=courses, 
-                            items=items, 
-                            upload=upload, 
+                            upload=filtered_upload, 
                             course_name=course_name,
                             switch_type=switch_type)
 
@@ -282,14 +285,24 @@ def course(course_name):
     username = session['username']
     role = session['role']
 
+    # courses, _ = myDB.select_info_home(sno=username)
+
     min_date = datetime.now().strftime('%Y-%m-%dT%H:%M')
     if role == 'teacher':
+        courses = myDB.select_info_teacher_all_class(tno=username)
         return render_template('course_main_publish.html', courses=courses, course_name=course_name, min_date=min_date)
     else:
+        courses = myDB.select_class_student(sno=username)
         return render_template('course_main.html', courses=courses, course_name=course_name)
     
 @app.route('/Cnotice/<string:course_name>')  # 新增公告栏，做不做再说
 def Cnotice(course_name):
+    username = session['username']
+    role = session['role']
+    if role == 'teacher':
+        courses = myDB.select_info_teacher_all_class(tno=username)
+    else:
+        courses = myDB.select_class_student(sno=username)
     return render_template('course_main.html', courses=courses, course_name=course_name)
 
 @app.route('/Cwork/<string:course_name>')
@@ -303,7 +316,18 @@ def Cwork(course_name):
               该课程下的所有work_outline: dict  
     '''
     username = session['username']
-
+    role = session['role']
+    if role == 'teacher':
+        courses = myDB.select_info_teacher_all_class(tno=username)
+        work_outline = myDB._select_teacher_work(tno=username, class_name=course_name)
+    else:
+        courses = myDB.select_class_student(sno=username)
+        work_outline = myDB._select_student_work(sno=username, class_name=course_name)
+    
+    for work in work_outline:
+        work['attachment_name'] = work['attachment_url'].split('/')[-1]
+        work['publish_time'] = work['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
+    
     return render_template('course_work.html', courses=courses, work_outline=work_outline, course_name=course_name)
 
 @app.route('/Csrc/<string:course_name>')
@@ -317,8 +341,15 @@ def Csrc(course_name):
               该课程下的所有files: dict  
     '''
     username = session['username']
+    role = session['role']
+    if role == 'teacher':
+        classes = myDB.select_info_teacher_all_class(tno=username)
+        files = myDB._select_teacher_src(tno=username, class_name=course_name)
+    else:
+        classes = myDB.select_class_student(sno=username)
+        files = myDB._select_student_src(sno=username, class_name=course_name)
 
-    return render_template('course_src.html', courses=courses, files=files, course_name=course_name)
+    return render_template('course_src.html', courses=classes, files=files, course_name=course_name)
 
 @app.route('/chatBOT', methods=['POST'])
 def chatBOT():
@@ -352,9 +383,50 @@ def chatBOT():
     }
     return jsonify(response)
 
-@app.route('/courses_square')
+@app.route('/courses_square', methods=['GET', 'POST'])
 def courses_square():
-    return render_template('courses_square.html', courses=courses)
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    username = session['username']
+    role = session['role']
+    # courses, _ = myDB.select_info_home(sno=username)
+    if role == 'teacher':
+        courses = myDB.select_info_teacher_all_class(tno=username)
+    else:
+        courses = myDB.select_class_student(sno=username)
+    # courses_info = [{
+    #     "name": 'DBMS',
+    #     "teacher": 'cjc'
+    # }]
+    courses_info = myDB.select_all_courses_info()
+
+
+    if request.method == 'POST':
+        username = session['username']
+        data = request.get_json()
+        course_name = data.get('course')
+        teacher_name = data.get('teacher')
+        print(course_name, teacher_name)
+        #TODO
+        '''
+        parameters: username, course_name, teacher_name
+        通过这三个参数将该学生添加到该班级
+        '''
+        try:
+            myDB.add_student_to_class(cname=course_name, cteacher=teacher_name, sno=username)
+            return jsonify({
+                    'success': True,
+                    'message': '申请成功'
+                })
+        except Exception as e:
+            return jsonify({
+                    'success': False,
+                    'message': str(e)
+                }), 400
+
+    
+
+    return render_template('courses_square.html', courses=courses, courses_info=courses_info)
 
 
 @app.route('/upload_file/<course_name>/src', methods=['POST'])
@@ -379,20 +451,31 @@ def upload_file(course_name):
         }), 400
 
     course_folder = os.path.join(
+        'static',
         app.config['UPLOAD_FOLDER'], 
         f"{course_name}", 
         'src'
-    )
+    ).replace('\\', '/')
     os.makedirs(course_folder, exist_ok=True)
-    file_path = os.path.join(course_folder, file.filename)
+    file_path = os.path.join(course_folder, file.filename).replace('\\', '/')
     file.save(file_path)
-    file_path = os.path.relpath(file_path, app.config['UPLOAD_FOLDER'])
+    file_path = os.path.relpath(file_path, os.path.join('static', app.config['UPLOAD_FOLDER'])).replace('\\', '/')
 
     # TODO
     # parameters: course_name, file_path
     # 上面的file_path例子： load/ICS/src/env.yml 存进数据库是只需要存 ICS/src/env.yml
     # 这里还没有考虑ICS课多个老师开的情况, 课程名+老师名能不能做key, 如ICS_柴云鹏/src/env.yml
-    
+    file_name = os.path.basename(file_path).replace('\\', '/')
+    try:
+        myDB.add_handout(hname=file_name, hfilepath=file_path)
+        myDB._post_handout(cname=course_name, hpath=file_path, tno=session['username'])
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': '文件上传失败'
+        }), 400
+
     return jsonify({
         'status': 'success',
         'message': '文件上传成功',
@@ -419,29 +502,37 @@ def publish_work(course_name):
         })
     
     try:
-        deadline = datetime.strptime(deadline, '%Y-%m-%dT%H:%M')
+        deadline = datetime.strptime(deadline, '%Y-%m-%dT%H:%M').strftime('%Y-%m-%d %H:%M:%S')
         attachment_path = None
         file = request.files['attachment']
         if file.filename != '':
             homework_folder = os.path.join(
+                'static',
                 app.config['UPLOAD_FOLDER'],
                 course_name,
                 title
-            )
+            ).replace('\\', '/')
             os.makedirs(homework_folder, exist_ok=True)
-            attachment_path = os.path.join(homework_folder, file.filename)
+            attachment_path = os.path.join(homework_folder, file.filename).replace('\\', '/')
             file.save(attachment_path)
             print(f'path: {attachment_path}')
         
         if attachment_path:  # 只取load/后的内容
-            attachment_path = os.path.relpath(attachment_path, app.config['UPLOAD_FOLDER'])
+            attachment_path = os.path.relpath(attachment_path, os.path.join('static', app.config['UPLOAD_FOLDER'])).replace('\\', '/')
 
         # TODO: 添加数据库操作
         # parameters: course_name, homework_type, title, description, deadline, publish_time [, attachment_path]
         # deadline format: %Y-%m-%dT%H:%M
         # publish_time format: %Y-%m-%dT%H:%M:%S
-        
-        
+        try:
+            myDB.add_assignment(aname=title, adeadline=deadline, aprofile=description, afilepath=attachment_path, atype=homework_type)
+            myDB._post_assignment(cname=course_name, apath=attachment_path, tno=session['username'])
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({
+                'success': False,
+                'message': '发布失败，请稍后重试'
+            }), 400
         
         return jsonify({
             'success': True,

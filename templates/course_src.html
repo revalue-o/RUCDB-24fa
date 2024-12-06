@@ -124,7 +124,7 @@
                     </div>
                     {% for file in files %}
                     <div class="file-item">
-                        <a href="#" class="file-link" download>{{ file.name }}</a>
+                        <a href="{{ url_for('static', filename='load/' + file.src) }}" class="file-link" download>{{ file.name }}</a>
                         <span class="file-date" style="float: right;">{{ file.date }}</span>
                     </div>
                     {% endfor %}

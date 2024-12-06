@@ -569,7 +569,8 @@ class DatabaseManager:
                        aname: str,
                        adeadline: int,
                        aprofile: str,
-                       afilepath: str
+                       afilepath: str,
+                       atype: str
                        ):
         '''
         添加一个作业
@@ -578,6 +579,7 @@ class DatabaseManager:
             adeadline:  截止时间,Unix时间戳(距离1970年的秒数)
             aprofile:   作业简介,varchar(1024)
             afilepath:  文件路径,varchar(128)
+            atype:       作业类型,varchar(16)
 
         返回:
             0:  添加作业成功
@@ -598,8 +600,12 @@ class DatabaseManager:
             self._print_debug("添加作业失败.")
             return 2
 
-        query = f"insert into assignment (aname, adeadline, aprofile, afilepath) values ('{aname}', to_timestamp({adeadline}), '{aprofile}', '{afilepath}')"
-        self._cursor.execute(query)
+        # query = f"insert into assignment (aname, adeadline, aprofile, afilepath, atype) values ('{aname}', '{adeadline}::timestamp', '{aprofile}', '{afilepath}', '{atype}')"
+        query = """
+insert into assignment (aname, adeadline, aprofile, afilepath, atype) 
+values (%s, %s, %s, %s, %s);
+"""
+        self._cursor.execute(query, (aname, adeadline, aprofile, afilepath, atype))
         self._connection.commit()
         self._print_debug("添加作业成功.")
         return 0
@@ -636,7 +642,7 @@ class DatabaseManager:
             self._print_debug("布置作业失败.")
             return 1
         
-        query = f"insert into post_assignment values ({cno}, {ano}, '{tno}', now());"
+        query = f"insert into post_assignment values ({cno}, {ano}, '{tno}', date_trunc('second', now()));"
         self._cursor.execute(query)
         self._connection.commit()
         self._print_debug("布置作业成功.")
@@ -691,7 +697,7 @@ class DatabaseManager:
         except Exception as e:
             print(f"There is an error:{e}")
             return None
-        student_name=student_name[0][0]
+        #student_name=student_name[0][0]
         query_course=f"select cor1.coursename from course cor1,class cla1,attend_class at1 where at1.sno='{sno}' and at1.cno=cla1.cno and cla1.courseno=cor1.courseno;"
         try:
             self._cursor.execute(query_course)
@@ -701,7 +707,7 @@ class DatabaseManager:
             return None
         query_course=[i[0] for i in course_name]
         query_src = (
-            f"SELECT t1.tname, cour1.coursename, hand1.hname "
+            f"SELECT t1.tname, cla1.cname, hand1.hname "
             f"FROM attend_class at1, teach_class tc1, teacher t1, course cour1, class cla1, post_handout ph1, handout hand1 "
             f"WHERE at1.sno = '{sno}' "
             f"AND tc1.cno = at1.cno "
@@ -721,7 +727,7 @@ class DatabaseManager:
         for i in src:
             upload_info.append({"name":i[0],"course":i[1],"src":i[2]})
         query_work = (
-            f"SELECT t1.tname, cour1.coursename, ass1.aname "
+            f"SELECT t1.tname, cla1.cname, ass1.aname "
             f"FROM attend_class at1, teach_class tc1, teacher t1, course cour1, class cla1, post_assignment pa1, assignment ass1 "
             f"WHERE at1.sno = '{sno}' "
             f"AND tc1.cno = at1.cno "
@@ -739,9 +745,20 @@ class DatabaseManager:
             return None
         for i in work:
             upload_info.append({"name":i[0],"course":i[1],"work":i[2]})
-        return student_name,query_course,upload_info
-
-
+        return query_course,upload_info
+    def select_course_all(self):
+        query=(
+            f"select distinct c1.coursename "
+            f"from course c1;"
+        )
+        try:
+            self._cursor.execute(query)
+            courses=self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        new_courses=[i[0] for i in courses]
+        return new_courses
     def select_info_course(self,sno,course_name):
         pass
     def select_student_src(self,sno,course_name):
@@ -773,11 +790,11 @@ class DatabaseManager:
             return None
         files=[]
         for i in src:
-            files.append({"course":i[0],"name":i[1],"date":i[2],"path":i[3]})
+            files.append({"course":i[0],"name":i[1],"date":i[2],"src":i[3]})
         return files
     def select_student_work(self,sno,course_name):
         query_work = (
-            f"SELECT  cour1.coursename, ass1.aname ,ass1.adeadline,ass1.aprofile,ass1.afilepath "
+            f"SELECT  cour1.coursename, ass1.aname ,ass1.adeadline,ass1.aprofile,ass1.afilepath,ass1.atype,pa1.post_assignment_time "
             f"FROM attend_class at1, course cour1, class cla1, post_assignment pa1, teach_class tc1,assignment ass1 "
             f"WHERE at1.sno = '{sno}' "
             f"AND cla1.cno = at1.cno "
@@ -794,13 +811,33 @@ class DatabaseManager:
             return None
         work_load=[]
         for i in work:
-            work_load.append({"course":i[0],"name":i[1],"deadline":i[2],"profile":i[3],"path":i[4]})
+            work_load.append({"course":i[0],"name":i[1],"deadline":i[2],"description":i[3],"attachment_url":i[4],"type":i[5],"publish_time":i[6]})
         return work_load
+    def select_all_courses_info(self):
+        '''
+        查询所有教学班信息
+        '''
+        query = '''
+select c.cname, t.tname
+from teach_class tc, class c, teacher t
+where tc.cno = c.cno and tc.tno = t.tno;
+'''
+        try:
+            self._cursor.execute(query)
+            courses_info = self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        courses_load = []
+        for i in courses_info:
+            courses_load.append({"name": i[0], "teacher": i[1]})
+        return courses_load
     
+
 #下面这个函数是dhl写的，用于执行sql语句来测试
     def testSQL(self):
         # query = f"select * from course,class where class.courseno=course.courseno;"
-        query = f"select * from class;"
+        query = f"select * from teach_class;"
         self._cursor.execute(query)
         src=self._cursor.fetchall()
         print(src)
@@ -828,7 +865,8 @@ class DatabaseManager:
     接受cname（教学班名），cteacher（教学的老师），sno（学生学号）功能为添加该学生到该教学班
     '''
     #还有一个任务是修改add_course的前端使得加课程的时候顺便加教学班
-    def add_course_and_class(self,coursename):
+
+    def add_course_and_class(self,coursename, tno):
         '''
         添加一门课程，同时添加对应的教学班，教学班名称=课程名+yyyy+学期
         '''
@@ -851,6 +889,226 @@ class DatabaseManager:
         self._cursor.execute(query)
         self._connection.commit()
         self._print_debug("添加教学班成功.")
-        return 0
 
+        query = f"select cno from class where cname='{cname}';"
+        self._cursor.execute(query)
+        src=self._cursor.fetchall()
+        cno=int(src[0][0])
+
+        query = f"insert into teach_class (cno, tno) values ('{cno}', '{tno}')"
+        self._cursor.execute(query)
+        self._connection.commit()
+        self._print_debug("添加教师-教学班关系成功.")
+        return 0
+    
+    def select_class_student(self, sno):
+        query = f"""
+select c1.cname
+from attend_class ac1, class c1
+where ac1.sno = '{sno}' and ac1.cno = c1.cno;
+"""
+        try:
+            self._cursor.execute(query)
+            class_name = self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        return [i[0] for i in class_name]
+    
+    def select_info_teacher_all_class(self,tno):
+        query=(
+            f"select class1.cname "
+            f"from class class1,teach_class tc1 "
+            f"where tc1.tno='{tno}' and tc1.cno=class1.cno;"
+        )
+        try:
+            self._cursor.execute(query)
+            class_name=self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        return [i[0] for i in class_name]
+    
+    def select_info_teacher_home(self,tno):
+        query_course=f"select cor1.coursename from course cor1,class cla1,teach_class tc1 where tc1.tno='{tno}' and tc1.cno=cla1.cno and cla1.courseno=cor1.courseno;"
+        try:
+            self._cursor.execute(query_course)
+            course_name=self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        query_course=[i[0] for i in course_name]
+        query_src = (
+            f"SELECT t1.tname, cla1.cname, hand1.hname "
+            f"FROM attend_class at1, teach_class tc1, teacher t1, course cour1, class cla1, post_handout ph1, handout hand1 "
+            f"WHERE tc1.tno = '{tno}' "
+            f"AND tc1.cno = at1.cno "
+            f"AND tc1.tno = t1.tno "
+            f"AND cla1.cno = tc1.cno "
+            f"AND cour1.courseno = cla1.courseno "
+            f"AND ph1.cno = tc1.cno "
+            f"AND ph1.hno = hand1.hno;"
+        )
+        try:
+            self._cursor.execute(query_src)
+            src=self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        upload_info=[]
+        for i in src:
+            upload_info.append({"name":i[0],"course":i[1],"src":i[2]})
+        query_work = (
+            f"SELECT t1.tname, cla1.cname, ass1.aname "
+            f"FROM attend_class at1, teach_class tc1, teacher t1, course cour1, class cla1, post_assignment pa1, assignment ass1 "
+            f"WHERE tc1.tno = '{tno}' "
+            f"AND tc1.cno = at1.cno "
+            f"AND tc1.tno = t1.tno "
+            f"AND cla1.cno = at1.cno "
+            f"AND cour1.courseno = cla1.courseno "
+            f"AND pa1.cno = tc1.cno "
+            f"AND pa1.ano = ass1.ano;"
+        )
+        try:
+            self._cursor.execute(query_work)
+            work=self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        for i in work:
+            upload_info.append({"name":i[0],"course":i[1],"work":i[2]})
+        return query_course,upload_info
+    
+    def select_cno_from_cname(self,cname) -> int:
+        query=f"select cno from class where cname='{cname}';"
+        self._cursor.execute(query)
+        src=self._cursor.fetchall()
+        cno=int(src[0][0])
+        return cno
+    def select_hno_from_hpath(self, hpath) -> int:
+        query = f"select hno from handout where hfilepath='{hpath}';"
+        self._cursor.execute(query)
+        src=self._cursor.fetchall()
+        hno=int(src[0][0])
+        return hno
+    def _post_handout(self, cname, hpath, tno):
+        return self.post_handout(
+            cno=self.select_cno_from_cname(cname),
+            hno=self.select_hno_from_hpath(hpath),
+            tno=tno
+        )
+
+    def select_ano_from_afilepath(self, apath):
+        query = f"select ano from assignment where afilepath='{apath}';"
+        self._cursor.execute(query)
+        src = self._cursor.fetchall()
+        return int(src[0][0])
+    def _post_assignment(self, cname, apath, tno):
+        return self.post_assignment(
+            cno=self.select_cno_from_cname(cname),
+            ano=self.select_ano_from_afilepath(apath),
+            tno=tno
+        )
+    
+    def find_course_name_by_classname(self,classname):
+        query=f"select courseno from class where cname='{classname}';"
+        self._cursor.execute(query)
+        courseno=self._cursor.fetchall()
+        courseno=int(courseno[0][0])
+        query=f"select coursename from course where courseno={courseno};"
+        self._cursor.execute(query)
+        coursename=self._cursor.fetchall()
+        coursename=coursename[0][0]
+        return coursename
+    def _select_student_src(self,sno,class_name):
+        course_name=self.find_course_name_by_classname(class_name)
+        return self.select_student_src(sno,course_name)
+    
+    def _select_student_work(self,sno,class_name):
+        course_name=self.find_course_name_by_classname(class_name)
+        return self.select_student_work(sno,course_name)
+    
+    def _select_teacher_src(self,tno,class_name):
+        course_name=self.find_course_name_by_classname(class_name)
+        query_src = (
+            f"SELECT cour1.coursename, hand1.hname,ph1.post_handout_time,hand1.hfilepath "
+            f"FROM teach_class tc1, course cour1, class cla1, post_handout ph1, handout hand1 "
+            f"WHERE tc1.tno = '{tno}' "
+            f"AND cla1.cno= tc1.cno "
+            f"AND cour1.courseno = cla1.courseno "
+            f"AND ph1.cno = tc1.cno "
+            f"AND ph1.hno = hand1.hno "
+            f"AND cour1.coursename LIKE '{course_name}'"
+        )
+        try:
+            self._cursor.execute(query_src)
+            src=self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        files=[]
+        for i in src:
+            files.append({"course":i[0],"name":i[1],"date":i[2],"src":i[3]})
+        return files  
+
+
+    def _select_teacher_work(self, tno, class_name):
+        course_name=self.find_course_name_by_classname(class_name)
+        query_work = (
+            f"SELECT  cour1.coursename, ass1.aname, ass1.adeadline, ass1.aprofile, ass1.afilepath, ass1.atype, pa1.post_assignment_time "
+            f"FROM teach_class tc1, course cour1, class cla1, post_assignment pa1, assignment ass1 "
+            f"WHERE tc1.tno = '{tno}' "
+            f"AND cla1.cno= tc1.cno "
+            f"AND cour1.courseno = cla1.courseno "
+            f"AND pa1.cno = tc1.cno "
+            f"AND pa1.ano = ass1.ano "
+            f"AND cour1.coursename LIKE '{course_name}';"
+        )
+        try:
+            self._cursor.execute(query_work)
+            work = self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        files=[]
+        for i in work:
+            files.append({"course":i[0],"name":i[1],"deadline":i[2],"description":i[3],"attachment_url":i[4],"type":i[5],"publish_time":i[6]})
+        return files
         
+
+'''
+TODO:
+1.select_info_home函数仅考虑了学生的情况，应该增加对教师的查询
+2.负责对接的后端需要过滤特殊字符，防止SQL注入
+3.需要增加获取课程信息的接口，便于前端做出教师用户添加教学班的下拉菜单（总不能遍历所有学生来找出所有课程吧）
+4.对于handout同3，感觉应该写一个针对教师用户的hangout查询接口
+'''
+    
+from datetime import datetime, timedelta
+if __name__ == '__main__':
+    db = DatabaseManager()
+    db.connect()
+    # deadline = '2024-12-06T16:24'
+    # deadline = datetime.strptime(deadline, '%Y-%m-%dT%H:%M').strftime('%Y-%m-%d %H:%M:%S')
+    # print(deadline)
+    # db.add_assignment(aname='实验一', adeadline=deadline, aprofile='实验一', afilepath='tmp20241/实验一.txt', atype='实验')
+
+    # print(db.select_info_teacher_home(tno='2022201466'))
+    # print(db.select_cno_from_cname(cname='崩坏20241'))
+    # print(db.select_all_courses_info())
+    # print(db._select_teacher_work(tno='2022201466', class_name='原神20241'))
+    # query = f"select * from assignment;"
+    # db._cursor.execute(query)
+    # src = db._cursor.fetchall()
+    # print(src)
+    # query = f"select * from post_assignment;"
+    # db._cursor.execute(query)
+    # src = db._cursor.fetchall()
+    # print(src)
+    # print(db.select_hno_from_hpath(hpath='./0.txt'))
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    next = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')
+    print(now > next)
+    print(now < next)
+    print(now == next)
+    print(now, next)
