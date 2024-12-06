@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../static/css/normalize.css" />
     <link rel="stylesheet" href="../static/css/header.css" />
     <link rel="stylesheet" href="../static/css/course_work.css" />
+    <link rel="stylesheet" href="../static/css/pagination.css" />
 </head>
 
 <body>
@@ -147,19 +148,19 @@
                                 <div class="time-info"> 
                                     <p class="deadline">
                                         <span>截止日期:</span>
-                                        <span lang="en">ddl{{ work.deadline }}</span>
+                                        <span lang="en">{{ work.deadline }}</span>
                                     </p>
-                                    <p class="publish-time">publish: 2024-11-19 20:54:30{{ work.publish_time }}</p> 
+                                    <p class="publish-time">publish: {{ work.publish_time }}</p> 
                                 </div>
-                                <p class="description">description{{ work.description }}</p>
+                                <p class="description">{{ work.description }}</p>
                                 <div class="requirements">
                                     <h4>要求：</h4>
-                                    requirements{{ work.requirements | safe }}
+                                    {{ work.requirements | safe }}
                                 </div>
                                 <div class="attachment">
                                     <h4>附件：</h4>
-                                    <a href="{{ work.attachment_url }}" class="attachment-link">
-                                        link{{ work.attachment_name }}
+                                    <a href="{{ url_for('static', filename='load/' + work.attachment_url) }}" class="attachment-link">
+                                        {{ work.attachment_name }}
                                     </a>
                                 </div>
                                 {% if work.status != 'submitted' %}
@@ -170,6 +171,11 @@
                     </div>
                     {% endfor %}
                 </div>
+                <div class="pagination">
+                    <button onclick="previousPage()" id="prev-btn" class="page-btn">上一页</button>
+                    <span id="page-info">1 / 1</span>
+                    <button onclick="nextPage()" id="next-btn" class="page-btn">下一页</button>
+                </div>
             </div>
 
             {% include "_chat.html" %}
@@ -178,6 +184,7 @@
 
 <script type="module" src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/scroll.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/pagination_forwork.js') }}"></script>
 <script>
     function toggleDetails(element) {
         const details = element.querySelector('.homework-details');

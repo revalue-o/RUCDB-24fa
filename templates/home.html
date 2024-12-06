@@ -112,9 +112,6 @@
                     <a href="#">大纲</a>
                 </div>
                 <div class="content-list" id="content-list">
-                    <div class="content-item">
-                        <a href="#">aaa课程资料</a>
-                    </div>
                     {% for item in upload %}
                     <div class="content-item">
                         {% if 'src' in item %}
@@ -134,12 +131,6 @@
                         </div>
                         <a href="{{ url_for('Cwork', course_name=item.course) }}">{{ item.work }}</a>
                         {% endif %}
-                    </div>
-                    {% endfor %}
-                    <!-- 下面的for循环是测试分页器 -->
-                    {% for item in items %}
-                    <div class="content-item">
-                        <a href="#">{{ item }}</a>
                     </div>
                     {% endfor %}
 

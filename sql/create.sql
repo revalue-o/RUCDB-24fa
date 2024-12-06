@@ -26,7 +26,10 @@ create table assignment
     aprofile varchar(1024),
 
     -- 文件路径
-    afilepath varchar(128)
+    afilepath varchar(128),
+
+    -- 作业类型
+    atype varchar(16)
 );
 
 create table course

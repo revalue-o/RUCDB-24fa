@@ -23,7 +23,8 @@
                             <div class="msg-entry">
                                 <div class="msg-list">
                                     {% for course in courses[:8] %}
-                                    <a class="msg-item" href="{{ url_for('course', course_name=course) }}">{{ course }}</a>
+                                    <a class="msg-item" href="{{ url_for('course', course_name=course) }}">{{ course
+                                        }}</a>
                                     {% endfor %}
                                     {% if courses|length > 8 %}
                                     <div class="msg-item">...</div>
@@ -74,11 +75,11 @@
     
             <div class="course-grid">
                 <!-- 课程卡片示例 -->
-                 {% for i in range(10) %}
+                 {% for course_ in courses_info %}
                 <div class="course-card">
-                    <div class="course-title">PS秋季实战秋季实战秋季实战秋季实战</div>
-                    <div class="teacher-name">谢红</div>
-                    <button class="join-btn">申请加入</button>
+                    <div class="course-title">{{ course_.name }}</div>
+                    <div class="teacher-name">{{ course_.teacher }}</div>
+                    <button class="join-btn" data-course="{{ course_.name }}" data-teacher="{{ course_.teacher }}">申请加入</button>
                 </div>
                 {% endfor %}
     
@@ -93,4 +94,5 @@
 
 <script type="module" src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/scroll.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/square_req.js') }}"></script>
 </html>
