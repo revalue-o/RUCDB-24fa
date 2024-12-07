@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>课程广场</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/Ulogo.ico') }}"></link>
     <link rel="stylesheet" href="../static/css/courses_square.css">
     <link rel="stylesheet" href="../static/css/home.css" />
     <link rel="stylesheet" href="../static/css/normalize.css" />
@@ -16,7 +17,7 @@
         <div class="header">
             <div class="header-bar">
                 <div class="left-entry">
-                    <a href="/home" class="left-item">首页</a>
+                    <a href="{{ url_for('home') }}" class="left-item">首页</a>
                     <a href="#" class="left-item" id="course-trigger">课程</a>
                     <div class="is-bottom" style="margin-left: 0px">
                         <div class="pop-content">
@@ -39,7 +40,16 @@
                     <a href="#" class="left-item">小组</a>
                 </div>
                 <div class="right-entry">
-                    <a href="#">{{ session.username }}</a>
+                    <a href="#" id="message-trigger" class="right-item">{{ session.username }}</a>
+                    <div class="is-bottom" style="margin-left: 0;">
+                        <div class="pop-content">
+                            <div class="msg-entry">
+                                <div class="msg-list">
+                                    <a class="msg-item" href="{{ url_for('logout') }}">Log out</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="header-inner">
@@ -47,7 +57,7 @@
                     <div id="app">loading...</div>
                 </div>
                 <div class="banner-inner">
-                    <a href="https://www.bilibili.com/" class="inner-logo">
+                    <a href="{{ url_for('home') }}" class="inner-logo">
                         <span class="logo-text">Unicourse</span>
                     </a>
                 </div>
@@ -59,10 +69,7 @@
                 <h1>课程广场</h1>
             </div>
     
-            <div class="notice">
-                提示: 以下课程是按照<span>创建时间</span>, 从新到老排序的。<br>
-                建议使用<span>ctrl+F</span>或<span>command+F</span>查找课程或任课教师, 搜索功能将近期上线)
-            </div>
+            
     
             <div class="time-select">
                 <label>请选择开课时间：</label>
@@ -79,7 +86,9 @@
                 <div class="course-card">
                     <div class="course-title">{{ course_.name }}</div>
                     <div class="teacher-name">{{ course_.teacher }}</div>
+                    {% if session['role'] == 'student' %}
                     <button class="join-btn" data-course="{{ course_.name }}" data-teacher="{{ course_.teacher }}">申请加入</button>
+                    {% endif %}
                 </div>
                 {% endfor %}
     

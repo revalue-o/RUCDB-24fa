@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/Ulogo.ico') }}"></link>
     <link rel="stylesheet" href="../static/css/home.css" />
     <link rel="stylesheet" href="../static/css/normalize.css" />
     <link rel="stylesheet" href="../static/css/header.css" />
@@ -50,9 +51,18 @@
                     <a href="#" class="left-item">小组</a>
                 </div>
                 <div class="right-entry">
-                    <a href="#" class="right-item">{{ session.username }}</a>
+                    <a href="#" id="message-trigger" class="right-item">{{ session.username }}</a>
+                    <div class="is-bottom" style="margin-left: 0;">
+                        <div class="pop-content">
+                            <div class="msg-entry">
+                                <div class="msg-list">
+                                    <a class="msg-item" href="{{ url_for('logout') }}">Log out</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    <a href="#" id="message-trigger" class="right-item"><i class="fas fa-paper-plane"
+                    <!-- <a href="#" id="message-trigger" class="right-item"><i class="fas fa-paper-plane"
                             style="color: transparent; -webkit-text-stroke: 1px white;"></i></a>
                     <div class="is-bottom" style="margin-left: 0;">
                         <div class="pop-content">
@@ -63,7 +73,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                 </div>
             </div>
@@ -72,7 +82,7 @@
                     <div id="app">loading...</div>
                 </div>
                 <div class="banner-inner">
-                    <a href="https://www.bilibili.com/" class="inner-logo">
+                    <a href="{{ url_for('home') }}" class="inner-logo">
                         <span class="logo-text">Unicourse</span>
                     </a>
                 </div>
@@ -101,13 +111,13 @@
             <!-- 右侧内容区 -->
             <div class="content-area">
                 <div class="content-nav">
-                    <a href="{{ url_for('home', course_name=course_name) }}" 
+                    <a href="{{ url_for('home', course_name=course_name) }}"
                         class="{{ 'active' if not switch_type else '' }}">全部</a>
                     <a href="#">问答</a>
                     <a href="#">公告</a>
                     <a href="{{ url_for('home', course_name=course_name, switch_type='work') }}"
                         class="{{ 'active' if switch_type == 'work' else '' }}">作业</a>
-                    <a href="{{ url_for('home', course_name=course_name, switch_type='src') }}" 
+                    <a href="{{ url_for('home', course_name=course_name, switch_type='src') }}"
                         class="{{ 'active' if switch_type == 'src' else '' }}">课件</a>
                     <a href="#">大纲</a>
                 </div>

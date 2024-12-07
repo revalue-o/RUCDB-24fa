@@ -24,7 +24,7 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        account_type=request.form.get('account-type')
+        account_type= 'teacher' if myDB.check_teacher(username) else 'student'
         login_success=-1
         if account_type=='teacher':
             login_success=myDB.teacher_login_check(username,password)
@@ -135,7 +135,7 @@ def add_course():
         result=myDB.add_course_and_class(course_name,tno)
         if result==0:
             #courses[course_name] = {'description': 'fixed test str'}# 这一行是临时的，当从数据库中读取课程的API完成后将采用对应的API
-            return redirect(url_for('course_page', course_name=course_name))
+            return redirect(url_for('home'))
         elif result==1:
             return "错误的课程名称", 400
         return "课程名称和描述不能为空", 400
@@ -152,13 +152,14 @@ def course_page(course_name):
 @app.route('/logout')
 def logout():
     session.clear()  # 清除 session 数据
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 # TODO dhl将下面的这些列表改为从数据库中读取
 # 
 def get_course_list():
     return myDB.get_course_list()
 ## sq
+"""
 courses = [
     'ICS',
     '计算机网络',
@@ -211,7 +212,7 @@ files = [
 # name key取src的文件名
 for file in files:
     file['name'] = os.path.basename(file['src'])
-
+"""
 
 @app.route('/index')
 def index():
@@ -249,6 +250,9 @@ def home(course_name=None):
         courses = myDB.select_class_student(sno=username)
         _, upload = myDB.select_info_home(sno=username)
 
+    for item in upload:
+        item['date'] = item['date'].strftime('%Y-%m-%d %H:%M:%S')
+    upload = sorted(upload, key=lambda x: x['date'], reverse=True)
     switch_type = request.args.get('switch_type', None)
     filtered_upload = upload.copy()
 
@@ -323,12 +327,87 @@ def Cwork(course_name):
     else:
         courses = myDB.select_class_student(sno=username)
         work_outline = myDB._select_student_work(sno=username, class_name=course_name)
-    
+        for work in work_outline:
+            submit_filepath = myDB.select_submit_assignment(sno=username, aname=work['name'], cname=course_name)
+            if submit_filepath:
+                work['status'] = 'submitted'
+                work['submit_filepath'] = submit_filepath
+                work['submit_name'] = submit_filepath.split('/')[-1]
+            else:
+                if isinstance(work['deadline'], str):
+                    work['deadline'] = datetime.strptime(work['deadline'], '%Y-%m-%d %H:%M:%S')
+                if work['deadline'] < datetime.now():
+                    work['status'] = 'timeout'
+                else:
+                    work['status'] = 'not-submitted'
+
     for work in work_outline:
-        work['attachment_name'] = work['attachment_url'].split('/')[-1]
+        if work['attachment_url']:
+            work['attachment_name'] = work['attachment_url'].split('/')[-1]
         work['publish_time'] = work['publish_time'].strftime('%Y-%m-%d %H:%M:%S')
     
-    return render_template('course_work.html', courses=courses, work_outline=work_outline, course_name=course_name)
+    def sort_key(work):
+        status_priority = {
+            'timeout': 2,
+            'not-submitted': 1,
+            'submitted': 0
+        }
+        
+        priority = status_priority.get(work['status'], 0)
+        
+        if work['status'] == 'not-submitted':
+            if isinstance(work['deadline'], str):
+                deadline = datetime.strptime(work['deadline'], '%Y-%m-%d %H:%M:%S')
+            else:
+                deadline = work['deadline']
+            return (priority, deadline)
+        elif work['status'] == 'submitted':
+            publish_time = datetime.strptime(work['publish_time'], '%Y-%m-%d %H:%M:%S')
+            return (priority, publish_time)
+        else:
+            return (priority, datetime.min)
+    
+    if role == 'teacher':
+        work_outline.sort(key=lambda x: x['publish_time'], reverse=True)
+        return render_template('course_work_teacher.html', courses=courses, work_outline=work_outline, course_name=course_name)
+    else:
+        work_outline.sort(key=sort_key, reverse=True)
+        return render_template('course_work.html', courses=courses, work_outline=work_outline, course_name=course_name)
+
+@app.route('/Submit_detail/<course_name>')
+def Submit_detail(course_name):
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    username = session['username']
+    role = session['role']
+    aname = request.args.get('aname', None)
+    deadline = request.args.get('deadline', None)
+    print(aname, deadline)
+    if role == 'teacher':
+        courses = myDB.select_info_teacher_all_class(tno=username)
+    else:
+        courses = myDB.select_class_student(sno=username)
+    students = myDB.select_all_students_in_class(cname=course_name)
+    submits = myDB.select_submit_detail(aname=aname, cname=course_name)
+    print('here')
+    for item in submits:
+        if isinstance(item['date'], str):
+            item['date'] = datetime.strptime(item['date'], '%Y-%m-%d %H:%M:%S')
+        deadline = datetime.strptime(deadline, '%Y-%m-%d %H:%M:%S')
+        item['status'] = 'timeout' if item['date'] > deadline else 'submitted'
+        item['submit_name'] = item['submit_file'].split('/')[-1]
+
+    for i in set(students) - set([j['sname'] for j in submits]):
+        submits.append({'aname': aname, 'sname': i, 'status': 'not-submitted', 'submit_file': None})
+    
+    status_priority = {
+        'submitted': 0,
+        'timeout': 1,
+        'not-submitted': 2
+    }
+    submits.sort(key=lambda x: (status_priority[x['status']], x['sname']))
+    
+    return render_template('submit_detail.html', courses=courses, course_name=course_name, aname=aname, submits=submits, deadline=deadline)
 
 @app.route('/Csrc/<string:course_name>')
 def Csrc(course_name):
@@ -348,6 +427,11 @@ def Csrc(course_name):
     else:
         classes = myDB.select_class_student(sno=username)
         files = myDB._select_student_src(sno=username, class_name=course_name)
+    
+    for item in files:
+        if isinstance(item['date'], str):
+            item['date'] = datetime.strptime(item['date'], '%Y-%m-%d %H:%M:%S')
+        item['date'] = item['date'].strftime('%Y-%m-%d %H:%M:%S')
 
     return render_template('course_src.html', courses=classes, files=files, course_name=course_name)
 
@@ -487,6 +571,52 @@ def upload_file(course_name):
         'file_path': file_path
     })
 
+@app.route('/submit_assignment/<course_name>/<assignment_name>', methods=['POST'])
+def submit_assignment(course_name, assignment_name):
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': '请先登录'})
+    
+    if 'file' not in request.files:
+        return jsonify({
+            'status': 'error',
+            'message': '没有文件被上传'
+        }), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({
+            'status': 'error',
+            'message': '没有选择文件'
+        }), 400
+    username = session['username']
+    folder = os.path.join(
+        'static',
+        app.config['UPLOAD_FOLDER'],
+        course_name,
+        assignment_name,
+        username
+    ).replace('\\', '/')
+    os.makedirs(folder, exist_ok=True)
+    file_path = os.path.join(folder, file.filename).replace('\\', '/')
+    file.save(file_path)
+    file_path = os.path.relpath(file_path, os.path.join('static', app.config['UPLOAD_FOLDER'])).replace('\\', '/')
+    try:
+        myDB._submit_assignment(submit_filepath=file_path, aname=assignment_name, sno=username, cname=course_name)
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': '提交失败，请稍后重试'
+        }), 400
+    return jsonify({
+        'status': 'success',
+        'message': '作业提交成功',
+        'file_path': file_path
+    })
+
+
+
 @app.route('/course/<course_name>/publish_work', methods=['POST'])
 def publish_work(course_name):
     if 'username' not in session:
@@ -530,8 +660,8 @@ def publish_work(course_name):
         # deadline format: %Y-%m-%dT%H:%M
         # publish_time format: %Y-%m-%dT%H:%M:%S
         try:
-            myDB.add_assignment(aname=title, adeadline=deadline, aprofile=description, afilepath=attachment_path, atype=homework_type)
-            myDB._post_assignment(cname=course_name, apath=attachment_path, tno=session['username'])
+            ano = myDB.add_assignment(aname=title, adeadline=deadline, aprofile=description, afilepath=attachment_path, atype=homework_type)
+            myDB._post_assignment(cname=course_name, ano=ano, tno=session['username'])
         except Exception as e:
             print(f"Error: {e}")
             return jsonify({
@@ -573,5 +703,5 @@ def publish_announcement(course_name):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8083)
+    app.run(debug=True, port=5000)
     

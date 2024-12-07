@@ -1,22 +1,20 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
+<html lang="zh">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>课程管理</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Submit Detail</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/Ulogo.ico') }}"></link>
     <link rel="stylesheet" href="../static/css/home.css" />
     <link rel="stylesheet" href="../static/css/normalize.css" />
     <link rel="stylesheet" href="../static/css/header.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <link rel="stylesheet" href="../static/css/publish.css" />
-    <link rel="stylesheet" href="../static/css/course_main.css" />
+    <link rel="stylesheet" href="../static/css/course_work.css" />
+    <link rel="stylesheet" href="../static/css/pagination.css" />
 </head>
 
 <body>
     <div class="container">
-        <!-- 顶部导航栏 -->
         <div class="header">
             <div class="header-bar">
                 <div class="left-entry">
@@ -24,9 +22,9 @@
                     <a href="#" class="left-item" id="course-trigger">课程</a>
                     <div class="is-bottom" style="margin-left: 0px">
                         <div class="pop-content">
-                           <div class="msg-entry">
+                            <div class="msg-entry">
                                 <div class="msg-list">
-                                   {% for course in courses[:8] %}
+                                    {% for course in courses[:8] %}
                                     <a class="msg-item" href="{{ url_for('course', course_name=course) }}">{{ course
                                         }}</a>
                                     {% endfor %}
@@ -39,7 +37,7 @@
                             </div>
                         </div>
                     </div>
-                    <a href=#" class="left-item">问答</a>
+                    <a href="#" class="left-item">问答</a>
                     <a href="#" class="left-item">小组</a>
                 </div>
                 <div class="right-entry">
@@ -71,7 +69,7 @@
             <div class="left-menu">
                 <div class="course-title">
                     <i class="icon-home"></i>
-                    <a href={{ url_for('course', course_name=course_name) }}">{{ course_name }}</a>
+                    <a href="{{ url_for('course', course_name=course_name) }}">{{ course_name }}</a>
                 </div>
 
                 <div class="menu-list">
@@ -87,7 +85,7 @@
                         <i class="icon-group"></i>
                         <span>小组</span>
                     </a>
-                    <a href="{{ url_for('Cwork', course_name=course_name) }}" class="menu-item">
+                    <a href="{{ url_for('Cwork', course_name=course_name) }}" class="menu-item active">
                         <i class="icon-homework"></i>
                         <span>作业</span>
                     </a>
@@ -110,7 +108,7 @@
                     <div class="switch-title">课程切换</div>
                     <div class="course-list">
                         {% for course in courses[:8] %}
-                        <a class="course-item" href="{{ url_for('course', course_name=course) }}">{{ course }}</a>
+                        <a class="course-item" href="{{ url_for('Cwork', course_name=course) }}">{{ course }}</a>
                         {% endfor %}
                         {% if courses|length > 8 %}
                         <div class="course-item">...</div>
@@ -120,76 +118,101 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 右侧内容区域 -->
             <div class="right-content">
-                <!-- 发布公告部分 -->
-                <div class="content-section announcement-section">
-                    <h3>发布公告</h3>
-                    <form id="announcement-form" method="POST"
-                        action="{{ url_for('publish_announcement', course_name=course_name) }}">
-                        <textarea name="content" placeholder="在此输入公告内容..." required></textarea>
-                        <button type="submit" class="btn" style="background-color: #39c5bb;">发布</button>
-                    </form>
-                </div>
+                <div class="notice">deadline: {{ deadline}}</div>
+                <div class="homework-list">
+                    {% for submit in submits %}
+                    <div class="homework-item">
+                        <div class="homework-header 
+                            {% if submit.status == 'timeout' %}
+                            quiz
+                            {% elif submit.status == 'submitted' %}
+                            submit
+                            {% elif submit.status == 'not-submitted' %}
+                            time-out
+                            {% endif %}" onclick="toggleDetails(this.parentElement)">
+                            <div class="homework-info">
+                                <h3>{{ submit.aname }}</h3>
+                                <span class="tag">{{ submit.sname }}</span>
+                            </div>
+                            <div class="status 
+                            {% if submit.status == 'timeout' %}
+                            not-submitted
+                            {% elif submit.status == 'not-submitted' %}
+                            timeout
+                            {% elif submit.status == 'submitted' %}
+                            submitted
+                            {% endif %}">
+                                {% if submit.status == 'timeout' %}
+                                超时
+                                {% elif submit.status == 'not-submitted' %}
+                                未提交
+                                {% elif submit.status == 'submitted' %}
+                                已提交
+                                {% endif %}
+                            </div>
+                        </div>
 
-                <!-- 上传课件部分 -->
-                <div class="content-section upload-section">
-                    <h3>上传课件</h3>
-                    <div class="upload-area">
-                        <button class="btn" id="selectFileBtn" style="background-color: #39c5bb;">点击选择文件</button>
-                        <input type="file" id="fileInput" hidden>
+                        <div class="homework-details" style="display: none;">
+                            <div class="details-content">
+                                <div class="requirements">
+                                    <h4>要求：</h4>
+                                    {{ submit.description | safe }}
+                                </div>
+                                {% if submit.submit_file %}
+                                <div class="attachment">
+                                    <h4>提交作业：</h4>
+                                    <a href="{{ url_for('static', filename='load/' + submit.submit_file) }}"
+                                        class="attachment-link" download>
+                                        {{ submit.submit_name }}
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
-
-                <!-- 布置新作业部分 -->
-                <div class="content-section homework-section">
-                    <h3>布置新作业</h3>
-                    <form id="homework-form">
-                        <div class="form-group">
-                            <label>类型</label>
-                            <select name="homework_type" required>
-                                <option value="">--- 请选择布置作业的类型 ---</option>
-                                <option value="实验">实验</option>
-                                <option value="小测验">小测验</option>
-                                <option value="普通作业">普通作业</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>标题</label>
-                            <input type="text" name="title" required>
-                        </div>
-                        <div class="form-group">
-                            <label>描述</label>
-                            <textarea name="content" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>截止时间</label>
-                            <input type="datetime-local" 
-                                   name="deadline" 
-                                   required 
-                                   min="{{ min_date }}"
-                                   class="datetime-input">
-                        </div>
-                        <div class="form-group">
-                            <label>附件</label>
-                            <input type="file" name="attachment" class="file-input">
-                        </div>
-                        <button type="submit" class="btn" style="background-color: #39c5bb;">发布作业</button>
-                    </form>
+                <div class="pagination">
+                    <button onclick="previousPage()" id="prev-btn" class="page-btn">上一页</button>
+                    <span id="page-info">1 / 1</span>
+                    <button onclick="nextPage()" id="next-btn" class="page-btn">下一页</button>
                 </div>
             </div>
 
-            {% include "_chat.html" %}
         </div>
     </div>
 </body>
 
 <script type="module" src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/scroll.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/publish_announcement.js') }}"></script>
-<script>const courseName = "{{ course_name }}";</script>
-<script type="module" src="{{ url_for('static', filename='js/publish_src.js')}}"></script>
-<script type="module" src="{{ url_for('static', filename='js/publish_work.js')}}"></script>
+<script type="module" src="{{ url_for('static', filename='js/pagination_forwork.js') }}"></script>
+<script>
+    function toggleDetails(element) {
+        const details = element.querySelector('.homework-details');
+        const allDetails = document.querySelectorAll('.homework-details');
+
+        // 关闭其他所有展开的详情
+        allDetails.forEach(detail => {
+            if (detail !== details && detail.style.display === 'block') {
+                detail.style.display = 'none';
+            }
+        });
+
+        // 切换当前详情的显示状态
+        if (details.style.display === 'block') {
+            details.style.display = 'none';
+        } else {
+            details.style.display = 'block';
+        }
+    }
+
+    // 防止点击详情区域时触发关闭
+    document.querySelectorAll('.homework-details').forEach(detail => {
+        detail.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    });
+</script>
 
 </html>

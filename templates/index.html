@@ -22,16 +22,14 @@
     </div>
 
     <div class="buttons move-bottom-stuff-yes">
-      <a href="https://discord.com/oauth2/authorize?client_id=195244341038546948&scope=bot+applications.commands" class="btn emerald-dropshadow white-text hover" target="_blank">Invite me 💖</a>
-      <a href="/commands" class="btn emerald-dropshadow white-text hover" target="_blank">Commands</a>
-      <a href="https://discord.gg/wGwgWJW" class="btn discord-dropshadow white-text hover" target="_blank">Discord</a>
-      <a href="https://github.com/KawaiiBot" class="btn github-dropshadow white-text hover" target="_blank">GitHub</a>
+      <a href="https://github.com/daliwang777" class="btn emerald-dropshadow white-text hover" target="_blank">Invite me</a>
+      <a href="https://github.com/revalue-o/RUCDB-24fa" class="btn github-dropshadow white-text hover" target="_blank">GitHub</a>
     </div>
 
     <div class="flex-grid branding-grid">
       <div class="col-xs-6">
         <div class="img-container">
-            <img src="../static/img/root_image_1.png" class="center">
+            <img src="{{ url_for('static', filename='img/home.png') }}" class="center">
         </div>
       </div>
       <div class="col-xs-6">
@@ -53,21 +51,17 @@
     <div class="flex-grid branding-grid">
       <div class="col-xs-6">
         <div class="img-container">
-            <img src="../static/img/root_image_2.png" class="center">
+            <img src="{{ url_for('static', filename='img/chat.png') }}" class="center">
         </div>
       </div>
       <div class="col-xs-6">
         <h2 class="title">Agent助手</h2>
         <p class="text">
-            UniCourse 于2013年9月上线、2014年4月改版、2016年4月4日完成新一轮系统升级，
-            是在中国人民大学信息学院和全国大学生创新实验计划国家级立项支持下、
-            由中国人民大学信息学院学生建立的课程辅助学习平台。我们相信普通大学教育能够在互联网的辅助下，
-            改变传统课堂中知识仅从老师单向流向学生的状况，实现教学合一。用户可以充分发挥同伴互助精神，
-            在UniCourse中分享、讨论、消化、积累知识。同时，移动终端也会让学习变成简单而有趣的过程。
-            UniCourse团队5位初创成员均为中国人民大学信息学院2011级本科生。
-            我们相信平等开放的互联网精神能够为每一位用户带来更好的教学体验。我们在行动，
-            也希望每一位有观点的你能够帮助我们成长。
-            请将您对UniCourse的任何意见或建议发送至unicourse@163.com，感谢您的关注！
+            UniCourse的Agent助手是一个智能对话系统，它能够理解用户的自然语言查询，并将其转换为对应的数据库操作。
+            当用户提出诸如"查看DBMS课程的作业"这样的请求时，Agent会自动识别意图，调用DatabaseManager中的相关函数
+            （如select_info_teacher_work或select_student_work），获取数据后通过JavaScript生成对应的链接。
+            这种自然语言到数据库操作的无缝转换，让用户能够以更直观的方式与系统交互，提升了平台的易用性和效率。
+            同时，Agent还支持课程资料查询、作业提交状态查看等多种功能，为师生提供便捷的教学辅助服务。
         </p>
       </div>
     </div>
