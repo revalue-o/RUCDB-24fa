@@ -603,12 +603,14 @@ class DatabaseManager:
         # query = f"insert into assignment (aname, adeadline, aprofile, afilepath, atype) values ('{aname}', '{adeadline}::timestamp', '{aprofile}', '{afilepath}', '{atype}')"
         query = """
 insert into assignment (aname, adeadline, aprofile, afilepath, atype) 
-values (%s, %s, %s, %s, %s);
+values (%s, %s, %s, %s, %s)
+RETURNING ano;
 """
         self._cursor.execute(query, (aname, adeadline, aprofile, afilepath, atype))
+        ano = self._cursor.fetchone()[0]
         self._connection.commit()
         self._print_debug("添加作业成功.")
-        return 0
+        return ano
 
     def post_assignment(self,
                      cno: int,
@@ -707,7 +709,7 @@ values (%s, %s, %s, %s, %s);
             return None
         query_course=[i[0] for i in course_name]
         query_src = (
-            f"SELECT t1.tname, cla1.cname, hand1.hname "
+            f"SELECT t1.tname, cla1.cname, hand1.hname, ph1.post_handout_time "
             f"FROM attend_class at1, teach_class tc1, teacher t1, course cour1, class cla1, post_handout ph1, handout hand1 "
             f"WHERE at1.sno = '{sno}' "
             f"AND tc1.cno = at1.cno "
@@ -725,9 +727,9 @@ values (%s, %s, %s, %s, %s);
             return None
         upload_info=[]
         for i in src:
-            upload_info.append({"name":i[0],"course":i[1],"src":i[2]})
+            upload_info.append({"name":i[0],"course":i[1],"src":i[2],"date":i[3]})
         query_work = (
-            f"SELECT t1.tname, cla1.cname, ass1.aname "
+            f"SELECT t1.tname, cla1.cname, ass1.aname, pa1.post_assignment_time "
             f"FROM attend_class at1, teach_class tc1, teacher t1, course cour1, class cla1, post_assignment pa1, assignment ass1 "
             f"WHERE at1.sno = '{sno}' "
             f"AND tc1.cno = at1.cno "
@@ -744,7 +746,7 @@ values (%s, %s, %s, %s, %s);
             print(f"There is an error:{e}")
             return None
         for i in work:
-            upload_info.append({"name":i[0],"course":i[1],"work":i[2]})
+            upload_info.append({"name":i[0],"course":i[1],"work":i[2],"date":i[3]})
         return query_course,upload_info
     def select_course_all(self):
         query=(
@@ -801,6 +803,8 @@ values (%s, %s, %s, %s, %s);
             f"AND cour1.courseno = cla1.courseno "
             f"AND pa1.cno = tc1.cno "
             f"AND pa1.ano = ass1.ano "
+            f"AND tc1.cno = cla1.cno "
+            f"AND pa1.cno = cla1.cno "
             f"AND cour1.coursename LIKE '{course_name}';"
         )
         try:
@@ -939,10 +943,9 @@ where ac1.sno = '{sno}' and ac1.cno = c1.cno;
             return None
         query_course=[i[0] for i in course_name]
         query_src = (
-            f"SELECT t1.tname, cla1.cname, hand1.hname "
-            f"FROM attend_class at1, teach_class tc1, teacher t1, course cour1, class cla1, post_handout ph1, handout hand1 "
+            f"SELECT t1.tname, cla1.cname, hand1.hname, ph1.post_handout_time "
+            f"FROM teach_class tc1, teacher t1, course cour1, class cla1, post_handout ph1, handout hand1 "
             f"WHERE tc1.tno = '{tno}' "
-            f"AND tc1.cno = at1.cno "
             f"AND tc1.tno = t1.tno "
             f"AND cla1.cno = tc1.cno "
             f"AND cour1.courseno = cla1.courseno "
@@ -957,14 +960,13 @@ where ac1.sno = '{sno}' and ac1.cno = c1.cno;
             return None
         upload_info=[]
         for i in src:
-            upload_info.append({"name":i[0],"course":i[1],"src":i[2]})
+            upload_info.append({"name":i[0],"course":i[1],"src":i[2],"date":i[3]})
         query_work = (
-            f"SELECT t1.tname, cla1.cname, ass1.aname "
-            f"FROM attend_class at1, teach_class tc1, teacher t1, course cour1, class cla1, post_assignment pa1, assignment ass1 "
+            f"SELECT t1.tname, cla1.cname, ass1.aname, pa1.post_assignment_time "
+            f"FROM teach_class tc1, teacher t1, course cour1, class cla1, post_assignment pa1, assignment ass1 "
             f"WHERE tc1.tno = '{tno}' "
-            f"AND tc1.cno = at1.cno "
             f"AND tc1.tno = t1.tno "
-            f"AND cla1.cno = at1.cno "
+            f"AND cla1.cno = tc1.cno "
             f"AND cour1.courseno = cla1.courseno "
             f"AND pa1.cno = tc1.cno "
             f"AND pa1.ano = ass1.ano;"
@@ -976,7 +978,7 @@ where ac1.sno = '{sno}' and ac1.cno = c1.cno;
             print(f"There is an error:{e}")
             return None
         for i in work:
-            upload_info.append({"name":i[0],"course":i[1],"work":i[2]})
+            upload_info.append({"name":i[0],"course":i[1],"work":i[2],"date":i[3]})
         return query_course,upload_info
     
     def select_cno_from_cname(self,cname) -> int:
@@ -998,17 +1000,34 @@ where ac1.sno = '{sno}' and ac1.cno = c1.cno;
             tno=tno
         )
 
-    def select_ano_from_afilepath(self, apath):
-        query = f"select ano from assignment where afilepath='{apath}';"
+    def select_ano_from_aname(self, aname, cname):
+        query = f"""
+select ass1.ano 
+from assignment ass1, class cla1, post_assignment pa1 
+where ass1.aname='{aname}' and cla1.cno={self.select_cno_from_cname(cname)} and pa1.cno=cla1.cno and ass1.ano=pa1.ano;
+"""
         self._cursor.execute(query)
         src = self._cursor.fetchall()
         return int(src[0][0])
-    def _post_assignment(self, cname, apath, tno):
+    def _post_assignment(self, cname, ano, tno):
         return self.post_assignment(
             cno=self.select_cno_from_cname(cname),
-            ano=self.select_ano_from_afilepath(apath),
+            ano=ano,
             tno=tno
         )
+    def _submit_assignment(self, submit_filepath, aname, sno, cname):
+        return self.submit_assignment(
+            submit_filepath=submit_filepath,
+            ano=self.select_ano_from_aname(aname=aname, cname=cname),
+            sno=sno
+        )
+    def select_submit_assignment(self, sno, aname, cname):
+        query = f"select submit_filepath from submit_assignment where sno='{sno}' and ano={self.select_ano_from_aname(aname=aname, cname=cname)};"
+        self._cursor.execute(query)
+        src = self._cursor.fetchall()
+        if len(src) == 0:
+            return None
+        return src[0][0]
     
     def find_course_name_by_classname(self,classname):
         query=f"select courseno from class where cname='{classname}';"
@@ -1074,7 +1093,36 @@ where ac1.sno = '{sno}' and ac1.cno = c1.cno;
         for i in work:
             files.append({"course":i[0],"name":i[1],"deadline":i[2],"description":i[3],"attachment_url":i[4],"type":i[5],"publish_time":i[6]})
         return files
-        
+    def select_all_students_in_class(self, cname):
+        query = f"select sno from attend_class where cno={self.select_cno_from_cname(cname)};"
+        self._cursor.execute(query)
+        src = self._cursor.fetchall()
+        return [i[0] for i in src]
+    
+    def select_submit_detail(self, aname, cname):
+        query = f"""
+select stu1.sno, ass1.aname, sa1.submit_filepath, sa1.submit_time, ass1.aprofile
+from submit_assignment sa1, assignment ass1, student stu1
+where ass1.ano={self.select_ano_from_aname(aname=aname, cname=cname)} 
+and sa1.ano = ass1.ano 
+and stu1.sno = sa1.sno 
+and ass1.aname = '{aname}';
+"""
+        try:
+            self._cursor.execute(query)
+            submit_info = self._cursor.fetchall()
+        except Exception as e:
+            print(f"There is an error:{e}")
+            return None
+        submit = []
+        for i in submit_info:
+            submit.append({"sname":i[0],"aname":i[1],"submit_file":i[2],"date":i[3],"description":i[4]})
+        return submit
+    def check_teacher(self, username):
+        query = f"select * from teacher where tno='{username}';"
+        self._cursor.execute(query)
+        src = self._cursor.fetchall()
+        return len(src) > 0
 
 '''
 TODO:
@@ -1084,31 +1132,12 @@ TODO:
 4.对于handout同3，感觉应该写一个针对教师用户的hangout查询接口
 '''
     
-from datetime import datetime, timedelta
 if __name__ == '__main__':
     db = DatabaseManager()
     db.connect()
-    # deadline = '2024-12-06T16:24'
-    # deadline = datetime.strptime(deadline, '%Y-%m-%dT%H:%M').strftime('%Y-%m-%d %H:%M:%S')
-    # print(deadline)
-    # db.add_assignment(aname='实验一', adeadline=deadline, aprofile='实验一', afilepath='tmp20241/实验一.txt', atype='实验')
-
-    # print(db.select_info_teacher_home(tno='2022201466'))
-    # print(db.select_cno_from_cname(cname='崩坏20241'))
-    # print(db.select_all_courses_info())
-    # print(db._select_teacher_work(tno='2022201466', class_name='原神20241'))
-    # query = f"select * from assignment;"
-    # db._cursor.execute(query)
-    # src = db._cursor.fetchall()
-    # print(src)
-    # query = f"select * from post_assignment;"
-    # db._cursor.execute(query)
-    # src = db._cursor.fetchall()
-    # print(src)
-    # print(db.select_hno_from_hpath(hpath='./0.txt'))
-    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    next = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')
-    print(now > next)
-    print(now < next)
-    print(now == next)
-    print(now, next)
+    # db.drop_tables()
+    # db.create_tables()
+    print(db.select_ano_from_aname(aname="LAB", cname="原神20241"))
+    submits = db.select_submit_detail(aname="LAB", cname="原神20241")
+    print(submits)
+    # print(db.add_assignment(aname="LAB2", adeadline="2024-12-15T12:00:00", aprofile="test", afilepath="test", atype="homework"))

@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Course Work</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/Ulogo.ico') }}"></link>
     <link rel="stylesheet" href="../static/css/home.css" />
     <link rel="stylesheet" href="../static/css/normalize.css" />
     <link rel="stylesheet" href="../static/css/header.css" />
@@ -17,7 +18,7 @@
         <div class="header">
             <div class="header-bar">
                 <div class="left-entry">
-                    <a href="/home" class="left-item">首页</a>
+                    <a href="{{ url_for('home') }}" class="left-item">首页</a>
                     <a href="#" class="left-item" id="course-trigger">课程</a>
                     <div class="is-bottom" style="margin-left: 0px">
                         <div class="pop-content">
@@ -40,7 +41,16 @@
                     <a href="#" class="left-item">小组</a>
                 </div>
                 <div class="right-entry">
-                    <a href="#">{{ session.username }}</a>
+                    <a href="#" id="message-trigger" class="right-item">{{ session.username }}</a>
+                    <div class="is-bottom" style="margin-left: 0;">
+                        <div class="pop-content">
+                            <div class="msg-entry">
+                                <div class="msg-list">
+                                    <a class="msg-item" href="{{ url_for('logout') }}">Log out</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="header-inner">
@@ -48,7 +58,7 @@
                     <div id="app">loading...</div>
                 </div>
                 <div class="banner-inner">
-                    <a href="https://www.bilibili.com/" class="inner-logo">
+                    <a href="{{ url_for('home') }}" class="inner-logo">
                         <span class="logo-text">Unicourse</span>
                     </a>
                 </div>
@@ -114,6 +124,13 @@
                 <div class="notice">请同学们提交作业后做好备份。</div>
 
                 <div class="homework-list">
+                    {% if work_outline|length == 0 %}
+                    <div class="homework-item">
+                        <div class="homework-info" style="margin-bottom: 10px;">
+                            <h3 style="color: #999;">暂无作业</h3>
+                        </div>
+                    </div>
+                    {% endif %}
                     {% for work in work_outline %}
                     <div class="homework-item">
                         <div class="homework-header
@@ -145,26 +162,38 @@
 
                         <div class="homework-details" style="display: none;">
                             <div class="details-content">
-                                <div class="time-info"> 
+                                <div class="time-info">
                                     <p class="deadline">
                                         <span>截止日期:</span>
                                         <span lang="en">{{ work.deadline }}</span>
                                     </p>
-                                    <p class="publish-time">publish: {{ work.publish_time }}</p> 
+                                    <p class="publish-time">publish: {{ work.publish_time }}</p>
                                 </div>
-                                <p class="description">{{ work.description }}</p>
                                 <div class="requirements">
                                     <h4>要求：</h4>
-                                    {{ work.requirements | safe }}
+                                    {{ work.description | safe }}
                                 </div>
+                                {% if work.attachment_name %}
                                 <div class="attachment">
                                     <h4>附件：</h4>
-                                    <a href="{{ url_for('static', filename='load/' + work.attachment_url) }}" class="attachment-link">
+                                    <a href="{{ url_for('static', filename='load/' + work.attachment_url) }}"
+                                        class="attachment-link">
                                         {{ work.attachment_name }}
                                     </a>
                                 </div>
+                                {% endif %}
                                 {% if work.status != 'submitted' %}
-                                <button class="submit-btn">提交作业</button>
+                                <button class="submit-btn" id="submit-btn" data-aname="{{ work.name }}">提交作业</button>
+                                <input type="file" id="fileInput" hidden>
+                                {% endif %}
+                                {% if work.status == 'submitted' %}
+                                <div class="attachment">
+                                    <h4>你的提交：</h4>
+                                    <a href="{{ url_for('static', filename='load/' + work.submit_filepath) }}"
+                                        class="attachment-link">
+                                        {{ work.submit_name }}
+                                    </a>
+                                </div>
                                 {% endif %}
                             </div>
                         </div>
@@ -212,5 +241,7 @@
         });
     });
 </script>
+<script>const courseName = "{{ course_name }}";</script>
+<script type="module" src="{{ url_for('static', filename='js/submit_assignment.js') }}"></script>
 
 </html>

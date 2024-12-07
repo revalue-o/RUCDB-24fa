@@ -1,15 +1,29 @@
-{% extends "base.html" %}
-
-{% block content %}
-<h2>添加新课程</h2>
-<form method="post">
-    <label for="course_name">课程名称:</label>
-    <input type="text" id="course_name" name="course_name" required>
-    <br>
-    <label for="course_description">课程描述:</label>
-    <textarea id="course_description" name="course_description" required></textarea>
-    <br>
-    <button type="submit">提交</button>
-</form>
-<a href="{{ url_for('home') }}">返回首页</a>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/Ulogo.ico') }}"></link>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>课程信息发布</h1>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <form method="POST" action="/add_course">
+            <div class="form-group">
+                <label for="course_name">课程名称:</label>
+                <input type="text" id="course_name" name="course_name" required>
+            </div>
+            <div class="form-group">
+                <label for="course_description">课程描述:</label>
+                <input type="text" id="course_description" name="course_description" required>
+            </div>
+            <button type="submit">启动!</button>
+        </form>
+    </div>
+</body>
+</html>

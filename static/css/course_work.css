@@ -196,7 +196,7 @@ body {
 }
 .status.not-submitted {
     background-color: white;
-    color: #856404;
+    color: #666;
 }
 .status.timeout {
     color: #ffffff;  /* 白色文字以提高对比度 */
@@ -230,6 +230,10 @@ body {
 }
 .homework-header.quiz .tag {
     background-color: #FFB6C1;
+    color: white;
+}
+.homework-header.submit .tag {
+    background-color: #39C5BB;
     color: white;
 }
 .homework-header {

@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
+<html lang="zh">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Course Source</title>
+    <title>Course Work</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/Ulogo.ico') }}"></link>
     <link rel="stylesheet" href="../static/css/home.css" />
     <link rel="stylesheet" href="../static/css/normalize.css" />
     <link rel="stylesheet" href="../static/css/header.css" />
     <link rel="stylesheet" href="../static/css/course_work.css" />
-    <link rel="stylesheet" href="../static/css/course_src.css" />
     <link rel="stylesheet" href="../static/css/pagination.css" />
 </head>
 
 <body>
-    <!-- 顶部导航栏 -->
     <div class="container">
         <div class="header">
             <div class="header-bar">
@@ -27,7 +25,8 @@
                             <div class="msg-entry">
                                 <div class="msg-list">
                                     {% for course in courses[:8] %}
-                                    <a class="msg-item" href="{{ url_for('course', course_name=course) }}">{{ course }}</a>
+                                    <a class="msg-item" href="{{ url_for('course', course_name=course) }}">{{ course
+                                        }}</a>
                                     {% endfor %}
                                     {% if courses|length > 8 %}
                                     <div class="msg-item">...</div>
@@ -86,11 +85,11 @@
                         <i class="icon-group"></i>
                         <span>小组</span>
                     </a>
-                    <a href="{{ url_for('Cwork', course_name=course_name) }}" class="menu-item">
+                    <a href="{{ url_for('Cwork', course_name=course_name) }}" class="menu-item active">
                         <i class="icon-homework"></i>
                         <span>作业</span>
                     </a>
-                    <a href="{{ url_for('Csrc', course_name=course_name) }}" class="menu-item active">
+                    <a href="{{ url_for('Csrc', course_name=course_name) }}" class="menu-item">
                         <i class="icon-files"></i>
                         <span>课件</span>
                     </a>
@@ -109,10 +108,10 @@
                     <div class="switch-title">课程切换</div>
                     <div class="course-list">
                         {% for course in courses[:8] %}
-                            <a class="course-item" href="{{ url_for('Csrc', course_name=course) }}">{{ course }}</a>
+                        <a class="course-item" href="{{ url_for('Cwork', course_name=course) }}">{{ course }}</a>
                         {% endfor %}
                         {% if courses|length > 8 %}
-                            <div class="course-item">...</div>
+                        <div class="course-item">...</div>
                         {% endif %}
                         <div class="divider"></div>
                         <a class="course-item" href="{{ url_for('courses_square') }}">课程广场</a>
@@ -122,25 +121,67 @@
 
             <!-- 右侧内容区 -->
             <div class="right-content">
-                <div class="section-title">
-                    课件列表
-                </div>
+                <div class="notice">请同学们提交作业后做好备份。</div>
 
-                <div class="file-list">
-                    {% if files | length != 0 %}
-                    {% for file in files %}
-                    <div class="file-item">
-                        <a href="{{ url_for('static', filename='load/' + file.src) }}" class="file-link" download>{{ file.name }}</a>
-                            <span class="file-date" style="float: right;">{{ file.date }}</span>
+                <div class="homework-list">
+                    {% if work_outline|length == 0 %}
+                    <div class="homework-item">
+                        <div class="homework-info" style="margin-bottom: 10px;">
+                            <h3 style="color: #999;">暂无作业</h3>
                         </div>
-                    {% endfor %}
-                    {% else %}
-                    <div class="file-item">
-                        <span class="file-link">暂无课件</span>
                     </div>
                     {% endif %}
-                </div>
+                    {% for work in work_outline %}
+                    <div class="homework-item">
+                        <div class="homework-header
+                            {% if work.type == '实验' %}
+                                lab
+                            {% elif work.type == '普通作业' %}
+                                norm
+                            {% elif work.type == '小测验' %}
+                                quiz
+                            {% endif %}">
+                            <div class="homework-info" onclick="toggleDetails(this.parentElement.parentElement)">
+                                <h3>{{ work.name }}</h3>
+                                <span class="tag">{{ work.type }}</span>
+                            </div>
+                            <div class="status" style="background-color: white">
+                                <a href="{{ url_for('Submit_detail', course_name=course_name, aname=work.name, deadline=work.deadline) }}"
+                                    onclick="event.stopPropagation()"
+                                    target="_blank"
+                                    style="text-decoration: none; color: #39c5bb;">
+                                    作业审批
+                                </a>
+                            </div>
+                        </div>
 
+                        <div class="homework-details" style="display: none;">
+                            <div class="details-content">
+                                <div class="time-info">
+                                    <p class="deadline">
+                                        <span>截止日期:</span>
+                                        <span lang="en">{{ work.deadline }}</span>
+                                    </p>
+                                    <p class="publish-time">publish: {{ work.publish_time }}</p>
+                                </div>
+                                <div class="requirements">
+                                    <h4>要求：</h4>
+                                    {{ work.description | safe }}
+                                </div>
+                                {% if work.attachment_name %}
+                                <div class="attachment">
+                                    <h4>附件：</h4>
+                                    <a href="{{ url_for('static', filename='load/' + work.attachment_url) }}"
+                                        class="attachment-link">
+                                        {{ work.attachment_name }}
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
                 <div class="pagination">
                     <button onclick="previousPage()" id="prev-btn" class="page-btn">上一页</button>
                     <span id="page-info">1 / 1</span>
@@ -150,11 +191,44 @@
 
             {% include "_chat.html" %}
         </div>
-    </div>
 </body>
 
 <script type="module" src="{{ url_for('static', filename='js/home.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/pagination_forsrc.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/scroll.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/pagination_forwork.js') }}"></script>
+<script>
+    function toggleDetails(element) {
+        const details = element.querySelector('.homework-details');
+        const allDetails = document.querySelectorAll('.homework-details');
+
+        // 关闭其他所有展开的详情
+        allDetails.forEach(detail => {
+            if (detail !== details && detail.style.display === 'block') {
+                detail.style.display = 'none';
+            }
+        });
+
+        // 切换当前详情的显示状态
+        if (details.style.display === 'block') {
+            details.style.display = 'none';
+        } else {
+            details.style.display = 'block';
+        }
+    }
+
+    // 阻止链接点击事件冒泡
+    document.querySelectorAll('.submit-detail-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+
+    // 防止点击详情区域时触发关闭
+    document.querySelectorAll('.homework-details').forEach(detail => {
+        detail.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    });
+</script>
 
 </html>

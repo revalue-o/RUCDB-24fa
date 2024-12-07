@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/Ulogo.ico') }}"></link>
     <link rel="stylesheet" href="../static/css/home.css" />
     <link rel="stylesheet" href="../static/css/normalize.css" />
     <link rel="stylesheet" href="../static/css/header.css" />
@@ -48,7 +49,16 @@
                     <a href="#" class="left-item">小组</a>
                 </div>
                 <div class="right-entry">
-                    <a href="#">{{ session.username }}</a>
+                    <a href="#" id="message-trigger" class="right-item">{{ session.username }}</a>
+                    <div class="is-bottom" style="margin-left: 0;">
+                        <div class="pop-content">
+                            <div class="msg-entry">
+                                <div class="msg-list">
+                                    <a class="msg-item" href="{{ url_for('logout') }}">Log out</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="header-inner">
@@ -56,7 +66,7 @@
                     <div id="app">loading...</div>
                 </div>
                 <div class="banner-inner">
-                    <a href="https://www.bilibili.com/" class="inner-logo">
+                    <a href="{{ url_for('home') }}" class="inner-logo">
                         <span class="logo-text">Unicourse</span>
                     </a>
                 </div>
