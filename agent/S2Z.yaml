@@ -1,0 +1,6 @@
+IMAGE_NAME: "ghcr.io/huggingface/text-generation-inference:2.4.1"
+CONTAINER_NAME: "tgiserver"
+BAREMETAL_DIR: "/raid"
+SHARE_DIR: "/raid"
+MODEL_DIR: "/raid/qwen/QwQ-32B-Preview"
+NUM_GPUS: 8
