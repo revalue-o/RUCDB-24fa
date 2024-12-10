@@ -18,7 +18,7 @@ app.secret_key = secrets.token_hex(16)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 myDB = DatabaseManager.DatabaseManager()
 myDB.connect()
-#登录部分，负责人杜海乐
+
 @app.route('/login', methods=['GET', 'POST'])
 def login(): 
     if request.method == 'POST':
